@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AGC Akowonjo Teen Church - Building Teens in Faith, Friendship, and Purpose.">
+  <title>Teen's Church | AGC Akowonjo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header & Navbar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <span class="nav-logo">AGC Teens</span>
+      <button class="menu-toggle" onclick="toggleNav()">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#events">Events</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section id="hero">
+    <div class="hero-content">
+      <h1>Welcome to AGC Akowonjo Teen's Church</h1>
+      <p>Empowering Teens. Growing in Faith. Building Friendships.</p>
+      <button onclick="scrollToSection('about')">Learn More</button>
+    </div>
+    <div class="cube-container">
+      <div class="cube" id="cube">
+        <div class="face front">Faith</div>
+        <div class="face back">Hope</div>
+        <div class="face right">Love</div>
+        <div class="face left">Joy</div>
+        <div class="face top">Unity</div>
+        <div class="face bottom">Fun</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about">
+    <h2>About Us</h2>
+    <p>We are a vibrant community of teenagers passionate about Jesus, friendship, and making a difference. Join us for fun events, inspiring worship, and real conversations!</p>
+    <a href="About.html" class="btn">Read More</a>
+  </section>
+
+  <!-- Events Section -->
+  <section id="events">
+    <h2>Upcoming Events</h2>
+    <div id="event-countdown"></div>
+    <ul>
+      <li>Teen meetings – Mondays, 5pm</li>
+      <li>Church Worship Service – Sundays, 9am</li>
+      <li>Community Outreach – Monthly</li>
+    </ul>
+  <form class="event-rsvp" onsubmit="registerEvent(event)">
+  <input type="text" placeholder="Your Name" required>
+  <input type="email" placeholder="Your Email (for confirmation)" required>
+  <button type="submit">RSVP</button>
+</form>
+<div id="rsvp-message"></div>
+
+
+  <!-- Blog Section -->
+  <section id="blog">
+    <h2>Latest News & Blog</h2>
+    <div class="blog-list">
+      <article>
+        <h3>Teen Camp 2025: A Life-Changing Experience!</h3>
+        <p>Our annual camp was filled with worship, games, and new friendships. Read more about the highlights and testimonies from this year’s camp.</p>
+      </article>
+      <article>
+        <h3>Community Outreach: Making a Difference</h3>
+        <p>Last month, our teens volunteered in the local community, spreading love and hope. Discover how you can get involved in our next outreach!</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Gallery Section -->
+  <section id="gallery">
+    <h2>Photo Gallery</h2>
+    <div class="gallery-grid">
+      <img src="Pictures/worshipping.jpg" alt="Teens Worshipping in Church" loading="lazy">
+      <img src="Pictures/fun event.jpg" alt="Teens Having Fun" loading="lazy">
+      <img src="Pictures/group pics.jpg" alt="Group Photo of Teens" loading="lazy">
+      <img src="Pictures/outreach.jpg" alt="Community Outreach by Teens" loading="lazy">
+    </div>
+    <div class="gallery-3d-card">
+      <div class="gallery-3d-inner">
+        <div class="gallery-3d-front">Welcome!</div>
+        <div class="gallery-3d-back">AGC Teens</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Media Library Section -->
+  <section id="media">
+    <h2>Sermon & Media Library</h2>
+    <div class="media-library">
+      <video controls width="320" poster="images/sermon-thumb.jpg">
+        <source src="video/Anything.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <audio controls>
+        <source src="Audio/Father of Spirits.mp3" type="audio/mp3">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials">
+    <h2>What Teen's Say</h2>
+    <div class="testimonials-list">
+      <blockquote>"I've made lifelong friends and grown so much in my faith!"<br><span>- Sarah, 16</span></blockquote>
+      <blockquote>"The events are always fun and inspiring."<br><span>- Daniel, 15</span></blockquote>
+    </div>
+  </section>
+
+  <!-- Newsletter Subscription -->
+<form class="newsletter-form" onsubmit="subscribeNewsletter(event)">
+  <input type="email" placeholder="Your Email (for updates)" required>
+  <button type="submit">Subscribe</button>
+</form>
+<div id="newsletter-message"></div>
+
+
+  <!-- Prayer Request -->
+  <section id="prayer">
+  <h2>Prayer Request</h2>
+  <form class="prayer-form" onsubmit="submitPrayer(event)">
+    <input type="text" placeholder="Your Name" required>
+    <input type="email" placeholder="Your Email (optional)">
+    <textarea placeholder="Your Prayer Request" required></textarea>
+    <button type="submit">Send Request</button>
+  </form>
+  <div id="prayer-message"></div>
+</section>
+
+
+  <!-- Leadership Team -->
+  <section id="team">
+    <h2>Meet Our Leaders</h2>
+    <div class="team-grid">
+      <div class="team-member">
+        <img src="images/leader1.jpg" alt="Youth Pastor">
+        <h4>Pastor John</h4>
+        <p>Youth Pastor</p>
+      </div>
+      <div class="team-member">
+        <img src="images/leader2.jpg" alt="Assistant Leader">
+        <h4>Jane Smith</h4>
+        <p>Assistant Leader</p>
+      </div>
+      <div class="team-member">
+        <img src="images/leader3.jpg" alt="Music Director">
+        <h4>Michael Lee</h4>
+        <p>Music Director</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <p>Email us at <a href="mailto:teens@agcakowonjo.org">teens@agcakowonjo.org</a></p>
+    <div class="address-map-box">
+      <div class="address-info">
+        <strong>Our Location:</strong><br>
+        20/22 Omo-Oba Jesu Street,<br>
+        Akowonjo, Lagos State, Nigeria
+      </div>
+      <div class="map-visual">
+        <iframe src="https://www.google.com/maps/embed?..." width="220" height="140" style="border:0; border-radius:12px;" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <div class="social-links">
+      <a href="https://instagram.com/" target="_blank" rel="noopener">Instagram</a> |
+      <a href="https://facebook.com/" target="_blank" rel="noopener">Facebook</a>
+    </div>
+  </section>
+
+  <!-- Chat Widget -->
+  <div id="chat-widget" class="chat-widget">
+    <div class="chat-header" onclick="toggleChat()">💬 Need Help? Chat with us!</div>
+    <div class="chat-body" id="chat-body">
+      <div class="chat-message bot">Hi! How can we help you today?</div>
+    </div>
+    <form class="chat-input" onsubmit="sendChat(event)">
+      <input type="text" id="chat-input-field" placeholder="Type your message..." required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <p>&copy; 2025 AGC Akowonjo Teen Church | Built with love</p>
+  </footer>
+
+  <script src="homes.js"></script>
+</body>
+</html>
