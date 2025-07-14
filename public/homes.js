@@ -13,6 +13,8 @@ async function registerEvent(e) {
       body: JSON.stringify({ name, email })
     });
 
+      const msg = await res.text();
+
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || 'RSVP failed.');
 

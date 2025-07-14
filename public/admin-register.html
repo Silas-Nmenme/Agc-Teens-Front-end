@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Register | Teens Church</title>
+  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .register-container {
+      max-width: 400px;
+      margin: 60px auto;
+      padding: 30px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .register-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .register-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .register-container button {
+      width: 100%;
+      padding: 12px;
+      background: #008080;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .register-container .msg {
+      margin-top: 10px;
+      text-align: center;
+      color: green;
+    }
+    .register-container .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2>Admin Registration</h2>
+    <form id="adminRegisterForm">
+      <input type="text" id="name" placeholder="Full Name" required />
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Register</button>
+      <div class="msg" id="message"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("adminRegisterForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      const message = document.getElementById("message");
+      message.textContent = "Registering...";
+
+      try {
+        const response = await fetch("/api/admin/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          message.textContent = "Admin registered successfully!";
+          message.classList.remove("error");
+          document.getElementById("adminRegisterForm").reset();
+        } else {
+          message.textContent = result.error || "Registration failed.";
+          message.classList.add("error");
+        }
+      } catch (error) {
+        message.textContent = "Something went wrong.";
+        message.classList.add("error");
+      }
+    });
+    if (response.ok) {
+  message.textContent = "Check your email to verify your account!";
+}
+  </script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!-- public/verify.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Verification</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 100vh; background: #f3f3f3;
+      font-family: sans-serif; text-align: center;
+    }
+    h1 { color: #006666; }
+    .btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #006666;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Email Verification</h1>
+  <p id="message">Verifying your email...</p>
+
+  <script>
+    // Parse token from URL
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    if (!token) {
+      document.getElementById("message").innerText = "Invalid verification link.";
+    } else {
+      // Send token to backend
+      fetch(`/api/admin/verify-email?token=${token}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById("message").innerText = "Email verified! Redirecting to homepage...";
+            setTimeout(() => {
+              window.location.href = "app.html";
+            }, 3000);
+          } else {
+            document.getElementById("message").innerText = data.message || "Verification failed.";
+          }
+        })
+        .catch(err => {
+          document.getElementById("message").innerText = "An error occurred during verification.";
+          console.error(err);
+        });
+    }
+  </script>
+</body>
+</html>

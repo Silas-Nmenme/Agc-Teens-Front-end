@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Login | Teens Church</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .login-container {
+      max-width: 400px;
+      margin: 80px auto;
+      padding: 30px;
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .login-container input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .login-container button {
+      width: 100%;
+      padding: 12px;
+      background: #006666;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .login-container .msg {
+      margin-top: 10px;
+      text-align: center;
+    }
+    .error {
+      color: red;
+    }
+    .success {
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Admin Login</h2>
+    <form id="adminLoginForm">
+      <input type="email" id="email" placeholder="Email" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+      <div class="msg" id="loginMessage"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("adminLoginForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const msg = document.getElementById("loginMessage");
+
+      msg.textContent = "Logging in...";
+
+      try {
+        const response = await fetch("/api/admin/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ email, password })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          msg.textContent = "Login successful!";
+          msg.className = "msg success";
+          // Store token or redirect
+          window.location.href = "/admin-dashboard.html";
+        } else {
+          msg.textContent = result.error || "Login failed.";
+          msg.className = "msg error";
+        }
+      } catch (error) {
+        msg.textContent = "Server error. Try again.";
+        msg.className = "msg error";
+      }
+    });
+  </script>
+</body>
+</html>

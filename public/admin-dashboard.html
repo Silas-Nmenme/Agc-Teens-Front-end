@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard | Teens Church</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 30px;
+      background: #006666;
+      color: white;
+    }
+
+    header h1 {
+      font-size: 24px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .nav-buttons a {
+      background: #fff;
+      color: #006666;
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
+    .dashboard-content {
+      padding: 40px;
+    }
+
+    .card {
+      background: #f9f9f9;
+      border: 1px solid #ddd;
+      padding: 30px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+      margin-bottom: 10px;
+      color: #006666;
+    }
+    .nav-buttons a:hover {
+  opacity: 0.85;
+  transform: scale(1.02);
+  transition: 0.2s ease;
+}
+
+  </style>
+</head>
+<body>
+
+ <header>
+  <h1>Teens Church | Admin Dashboard</h1>
+  <div class="nav-buttons">
+    <a href="app.html" style="background: transparent; border: 2px solid #fff; color: white;">← Home</a>
+    <a href="admin-logout.html">Logout</a>
+
+  </div>
+</header>
+
+
+
+  <!-- DASHBOARD CONTENT -->
+  <div class="dashboard-content">
+    <div class="card">
+      <h2>Welcome, Admin</h2>
+      <p>This is the central dashboard where you can manage teens' RSVPs, prayers, events, and more.</p>
+    </div>
+
+    <div class="card">
+      <h2>Quick Links</h2>
+      <ul>
+        <li><a href="#">📋 View RSVPs</a></li>
+        <li><a href="#">🙏 Manage Prayer Requests</a></li>
+        <li><a href="#">📨 Newsletter Submissions</a></li>
+        <li><a href="#">📅 Event Countdown Settings</a></li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2>Statistics</h2>
+      <p><strong>Pending Verifications:</strong> 3</p>
+      <p><strong>Total Admins:</strong> 5</p>
+      <p><strong>Recent Prayer Requests:</strong> 7</p>
+    </div>
+  </div>
+
+<section id="dashboardData">
+  <h2 style="margin-top: 20px;">Recent RSVPs</h2>
+  <table id="rsvpTable" border="1" cellpadding="10">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Attendance</th>
+        <th>Submitted At</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+
+<script>
+  async function fetchRSVPs() {
+    const token = localStorage.getItem('adminToken');
+    try {
+      const res = await fetch('/api/admin/rsvps', {
+        headers: {
+          'Authorization': token
+        }
+      });
+      const data = await res.json();
+      if (data.success) {
+        const tableBody = document.querySelector('#rsvpTable tbody');
+        tableBody.innerHTML = '';
+
+        data.rsvps.forEach(rsvp => {
+          const row = `
+            <tr>
+              <td>${rsvp.name}</td>
+              <td>${rsvp.email}</td>
+              <td>${rsvp.attending ? 'Yes' : 'No'}</td>
+              <td>${new Date(rsvp.createdAt).toLocaleString()}</td>
+            </tr>
+          `;
+          tableBody.innerHTML += row;
+        });
+      } else {
+        console.error(data.error);
+      }
+    } catch (err) {
+      console.error("Failed to fetch RSVPs:", err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', fetchRSVPs);
+</script>
+
+</body>
+</html>
