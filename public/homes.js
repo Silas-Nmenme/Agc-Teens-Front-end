@@ -24,12 +24,15 @@ async function registerEvent(e) {
   }
 }
 
-// Prayer form submission
 async function submitPrayer(e) {
   e.preventDefault();
-  const name = e.target[0].value;
-  const email = e.target[1].value;
-  const request = e.target[2].value;
+
+  const name = e.target[0].value.trim();
+  const email = e.target[1].value.trim();
+  const request = e.target[2].value.trim();
+
+  const messageBox = document.getElementById('prayer-message');
+  messageBox.textContent = 'Submitting...';
 
   try {
     const res = await fetch(`${baseUrl}/api/prayer`, {
@@ -38,16 +41,27 @@ async function submitPrayer(e) {
       body: JSON.stringify({ name, email, request })
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Prayer request failed.');
+    let data;
+    try {
+      data = await res.json(); // ✅ safe attempt to parse
+    } catch (jsonError) {
+      throw new Error('Invalid server response. Please try again later.');
+    }
 
-    document.getElementById('prayer-message').textContent = data.message;
+    if (!res.ok) {
+      throw new Error(data.message || 'Prayer request failed.');
+    }
+
+    messageBox.textContent = data.message;
     e.target.reset();
+
   } catch (err) {
     console.error('Prayer Error:', err);
-    document.getElementById('prayer-message').textContent = 'Failed to submit prayer request.';
+    document.getElementById('prayer-message').textContent =
+      err.message || 'Failed to submit prayer request.';
   }
 }
+
 
 // Newsletter subscription
 async function subscribeNewsletter(e) {
