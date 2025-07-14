@@ -58,45 +58,45 @@
   </div>
 
   <script>
-    document.getElementById("adminRegisterForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+  document.getElementById("adminRegisterForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
 
-      const message = document.getElementById("message");
-      message.textContent = "Registering...";
+    const message = document.getElementById("message");
+    message.textContent = "Registering...";
 
-      try {
-        const response = await fetch("/api/admin/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ name, email, password })
-        });
+    try {
+      const response = await fetch("/api/admin/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name, email, password })
+      });
 
-        const result = await response.json();
+      const result = await response.json();
 
-       if (response.ok) {
-  message.textContent = "Admin registered successfully!";
-  localStorage.setItem("adminToken", result.token);
-  setTimeout(() => {
-    window.location.href = "dashboard.html";
-  }, 1000);
-}
- else {
-          message.textContent = result.error || "Registration failed.";
-          message.classList.add("error");
-        }
-      } catch (error) {
-        message.textContent = "Something went wrong.";
+      if (response.ok) {
+        message.textContent = "Admin registered successfully!";
+        message.classList.remove("error");
+        localStorage.setItem("adminToken", result.token); // Save token if returned
+        document.getElementById("adminRegisterForm").reset();
+        setTimeout(() => {
+          window.location.href = "dashboard.html";
+        }, 1000);
+      } else {
+        message.textContent = result.error || "Registration failed.";
         message.classList.add("error");
       }
-    });
-    if (response.ok) {
-  message.textContent = "Check your email to verify your account!";
-}
-  </script>
+    } catch (error) {
+      console.error("Registration error:", error);
+      message.textContent = "Something went wrong.";
+      message.classList.add("error");
+    }
+  });
+</script>
+
 </body>
 </html>
