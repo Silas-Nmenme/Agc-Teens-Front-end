@@ -78,11 +78,14 @@
 
         const result = await response.json();
 
-        if (response.ok) {
-          message.textContent = "Admin registered successfully!";
-          message.classList.remove("error");
-          document.getElementById("adminRegisterForm").reset();
-        } else {
+       if (response.ok) {
+  message.textContent = "Admin registered successfully!";
+  localStorage.setItem("adminToken", result.token);
+  setTimeout(() => {
+    window.location.href = "dashboard.html";
+  }, 1000);
+}
+ else {
           message.textContent = result.error || "Registration failed.";
           message.classList.add("error");
         }
