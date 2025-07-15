@@ -30,16 +30,16 @@ async function submitPrayer(e) {
 
   const name = e.target[0].value.trim();
   const email = e.target[1].value.trim();
-  const message = e.target[2].value.trim();
+  const request = e.target[2].value.trim();
 
-  const messageBox = document.getElementById('prayer-message');
+  const messageBox = document.getElementById('prayer-request');
   messageBox.textContent = 'Submitting...';
 
   try {
     const res = await fetch(`${baseUrl}/api/prayer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message }) //FIXED!
+      body: JSON.stringify({ name, email, message: request }) //FIXED!
     });
 
     const data = await res.json();
