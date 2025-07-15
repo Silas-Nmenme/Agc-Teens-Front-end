@@ -38,12 +38,12 @@ async function submitPrayer(e) {
     const res = await fetch(`${baseUrl}/api/prayer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, request })
+      body: JSON.stringify({ name, email, message: request })
     });
 
     let data;
     try {
-      data = await res.json(); // ✅ safe attempt to parse
+      data = await res.json(); //safe attempt to parse
     } catch (jsonError) {
       throw new Error('Invalid server response. Please try again later.');
     }
