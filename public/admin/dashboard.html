@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teens Church Admin Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <h1>Teens Church Admin</h1>
+    <div class="nav-links">
+      <a href="#">Profile</a>
+      <a href="#" onclick="adminLogout()">Logout</a>
+    </div>
+  </nav>
+
+  <!-- Sidebar + Main -->
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <ul>
+        <li><a href="#rsvpPanel">RSVPs</a></li>
+        <li><a href="#prayerPanel">Prayers</a></li>
+        <li><a href="#mediaPanel">Media Uploads</a></li>
+        <li><a href="#blogPanel">Blog Posts</a></li>
+        <li><a href="#subscribersPanel">Subscribers</a></li>
+      </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <h2>Dashboard Overview</h2>
+      <div class="cards">
+        <div class="card"><h3>Total RSVPs</h3><p id="rsvpCount">0</p></div>
+        <div class="card"><h3>Total Prayers</h3><p id="prayerCount">0</p></div>
+        <div class="card"><h3>Total Blogs</h3><p id="blogCount">0</p></div>
+        <div class="card"><h3>Total Subscribers</h3><p id="subscriberCount">0</p></div>
+        <div class="card"><h3>Total Media Files</h3><p id="mediaCount">0</p></div>
+      </div>
+
+      <!-- Panels -->
+      <div class="panel" id="rsvpPanel">
+        <button class="toggle-btn">View RSVPs</button>
+        <div class="panel-content">
+          <table id="rsvpTable"></table>
+        </div>
+      </div>
+
+      <div class="panel" id="prayerPanel">
+        <button class="toggle-btn">View Prayer Requests</button>
+        <div class="panel-content">
+          <table id="prayerTable"></table>
+        </div>
+      </div>
+
+      <div class="panel" id="blogPanel">
+        <button class="toggle-btn">View Blog Posts</button>
+        <div class="panel-content">
+          <table id="blogPostTable"></table>
+        </div>
+      </div>
+
+      <div class="panel" id="subscribersPanel">
+        <button class="toggle-btn">View Subscribers</button>
+        <div class="panel-content">
+          <table id="subscribersTable"></table>
+        </div>
+      </div>
+
+      <div class="panel" id="mediaPanel">
+        <button class="toggle-btn">View Media Files</button>
+        <div class="panel-content">
+          <table id="mediaTable"></table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <button class="toggle-btn">Upload Media</button>
+        <div class="panel-content">
+          <div id="dropzone" class="dropzone">
+            <p>Drag & drop media files here or <span class="select-text">click to select</span></p>
+            <input type="file" id="mediaFiles" name="media" multiple accept="image/*,video/*,audio/*" hidden />
+          </div>
+          <div id="previewList" class="preview-list"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle"></h3>
+      <form id="editForm">
+        <input type="hidden" id="editId">
+
+        <div>
+          <label>Name</label>
+          <input type="text" id="editName">
+        </div>
+
+        <div>
+          <label>Email</label>
+          <input type="email" id="editEmail">
+        </div>
+
+        <div id="eventGroup">
+          <label>Event</label>
+          <input type="text" id="editEvent">
+        </div>
+
+        <div id="requestGroup">
+          <label>Request</label>
+          <textarea id="editRequest"></textarea>
+        </div>
+
+        <button type="submit">Save</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

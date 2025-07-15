@@ -90,3 +90,17 @@ fetch('/api/admin/prayers', {
     Authorization: `Bearer ${token}` // token from localStorage
   }
 });
+
+  // Automatically apply system theme on first load
+  window.addEventListener('DOMContentLoaded', () => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (prefersDark) {
+      document.body.classList.add('dark');
+    }
+  });
+
+  // Toggle theme manually
+  function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+  }
+

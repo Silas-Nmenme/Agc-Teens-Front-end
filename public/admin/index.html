@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome | AGC Akowonjo Admin Dashboard</title>
+  <style>
+    :root {
+      --bg-light: linear-gradient(to right, #f9f9f9, #e3f0ff);
+      --bg-dark: linear-gradient(to right, #1e1e1e, #2e2e2e);
+      --box-bg-light: white;
+      --box-bg-dark: #2d2d2d;
+      --text-light: #2c3e50;
+      --text-dark: #f0f0f0;
+      --button-bg: #2c3e50;
+      --button-hover: #1a252f;
+      --button-back: #ccc;
+      --button-back-hover: #aaa;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      transition: background 0.3s ease;
+    }
+
+    body.dark-mode {
+      background: var(--bg-dark);
+    }
+
+    .welcome-box {
+      background: var(--box-bg-light);
+      padding: 3rem 2rem;
+      border-radius: 14px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      animation: fadeIn 0.6s ease-in-out;
+      transition: background 0.3s ease;
+    }
+
+    body.dark-mode .welcome-box {
+      background: var(--box-bg-dark);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .welcome-box h1,
+    .welcome-box p {
+      color: var(--text-light);
+      transition: color 0.3s ease;
+    }
+
+    body.dark-mode .welcome-box h1,
+    body.dark-mode .welcome-box p {
+      color: var(--text-dark);
+    }
+
+    .welcome-box h1 {
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .welcome-box p {
+      margin-bottom: 2rem;
+      font-size: 1rem;
+    }
+
+    .btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .btn-group button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      background-color: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn-group button:hover {
+      background-color: var(--button-hover);
+    }
+
+    .btn-group .back-btn {
+      background-color: var(--button-back);
+      color: #333;
+    }
+
+    .btn-group .back-btn:hover {
+      background-color: var(--button-back-hover);
+    }
+
+    .toggle-darkmode {
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      color: #2c3e50;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    body.dark-mode .toggle-darkmode {
+      color: #f0f0f0;
+    }
+
+    @media (max-width: 480px) {
+      .welcome-box {
+        padding: 2rem 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="welcome-box">
+    <h1>Welcome to AGC Akowonjo</h1>
+    <p>This is the Admin Dashboard. Please log in or register to continue.</p>
+
+    <div class="btn-group">
+      <button onclick="window.location.href='admin-login.html'">Login</button>
+      <button onclick="window.location.href='admin-register.html'">Register</button>
+      <button onclick="window.location.href='../App.html'" class="back-btn" title="Go to main site">← Back to Home</button>
+    </div>
+
+    <button class="darkmode" onclick="toggleDarkMode()">Dark Mode</button>
+  </div>
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+  </script>
+</body>
+</html>

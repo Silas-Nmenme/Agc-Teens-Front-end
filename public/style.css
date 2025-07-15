@@ -685,3 +685,46 @@ button:hover, .btn:hover {
   margin-top: 40px;
   border-radius: 16px 16px 0 0;
 }
+
+
+  :root {
+    --dark-bg: #121212;
+    --dark-text: #f1f1f1;
+    --dark-section-bg: #1e1e1e;
+  }
+
+  body.dark {
+    background-color: var(--dark-bg);
+    color: var(--dark-text);
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  body.dark section,
+  body.dark header,
+  body.dark footer,
+  body.dark .chat-widget,
+  body.dark .nav-links,
+  body.dark .team-member,
+  body.dark .blog-list article,
+  body.dark .gallery-3d-card {
+    background-color: var(--dark-section-bg);
+    color: var(--dark-text);
+  }
+
+  .dark-toggle {
+    position: fixed;
+    top: 10px;
+    right: 15px;
+    background: #2c3e50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 1000;
+    font-size: 0.9rem;
+  }
+
+  .dark-toggle:hover {
+    background: #1e2e3a;
+  }
