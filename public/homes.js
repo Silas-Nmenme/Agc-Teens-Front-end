@@ -38,30 +38,23 @@ async function submitPrayer(e) {
     const res = await fetch(`${baseUrl}/api/prayer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message: request })
+      body: JSON.stringify({ name, email, message: request }) // ✅ FIXED!
     });
 
-    let data;
-    try {
-      data = await res.json(); //safe attempt to parse
-    } catch (jsonError) {
-      throw new Error('Invalid server response. Please try again later.');
-    }
+    const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.message || 'Prayer request failed.');
+      throw new Error(data.error || 'Prayer request failed.');
     }
 
-    messageBox.textContent = data.message;
+    messageBox.textContent = data.message || 'Prayer submitted successfully!';
     e.target.reset();
 
   } catch (err) {
     console.error('Prayer Error:', err);
-    document.getElementById('prayer-message').textContent =
-      err.message || 'Failed to submit prayer request.';
+    messageBox.textContent = err.message || 'Failed to submit prayer request.';
   }
 }
-
 
 // Newsletter subscription
 async function subscribeNewsletter(e) {
