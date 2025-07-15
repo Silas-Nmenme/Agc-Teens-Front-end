@@ -60,39 +60,41 @@
   <script>
   document.getElementById("adminRegisterForm").addEventListener("submit", async function (e) {
     e.preventDefault();
+
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value;
 
     const message = document.getElementById("message");
     message.textContent = "Registering...";
+    message.classList.remove("error");
 
     try {
       const response = await fetch("/api/admin/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password })
       });
 
-      const result = await response.json();
+      const contentType = response.headers.get("content-type");
+      const result = contentType && contentType.includes("application/json") ? await response.json() : {};
 
       if (response.ok) {
         message.textContent = "Admin registered successfully!";
-        message.classList.remove("error");
-        localStorage.setItem("adminToken", result.token); // Save token if returned
+        localStorage.setItem("adminToken", result.token);
         document.getElementById("adminRegisterForm").reset();
+
         setTimeout(() => {
           window.location.href = "dashboard.html";
         }, 1000);
       } else {
+        console.warn("Registration error (client visible):", result);
         message.textContent = result.error || "Registration failed.";
         message.classList.add("error");
       }
     } catch (error) {
-      console.error("Registration error:", error);
-      message.textContent = "Something went wrong.";
+      console.error("Registration error (caught):", error);
+      message.textContent = "Something went wrong. Please check your internet connection or server logs.";
       message.classList.add("error");
     }
   });
