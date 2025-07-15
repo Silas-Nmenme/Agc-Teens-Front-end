@@ -24,12 +24,13 @@ async function registerEvent(e) {
   }
 }
 
+//Prayer request
 async function submitPrayer(e) {
   e.preventDefault();
 
   const name = e.target[0].value.trim();
   const email = e.target[1].value.trim();
-  const request = e.target[2].value.trim();
+  const message = e.target[2].value.trim();
 
   const messageBox = document.getElementById('prayer-message');
   messageBox.textContent = 'Submitting...';
