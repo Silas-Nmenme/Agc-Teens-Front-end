@@ -55,35 +55,19 @@
   </div>
 
   <script>
-    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+    async function submitCode() {
+      const email = document.getElementById("email").value;
+      const code = document.getElementById("code").value;
 
-      const email = document.getElementById('email').value;
-      const code = document.getElementById('code').value;
-      const verifyMsg = document.getElementById('verifyMsg');
+      const res = await fetch('/api/admin/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code })
+      });
 
-      try {
-        const res = await fetch('/api/admin/verify-code', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, code })
-        });
-
-        const data = await res.json();
-
-        if (res.ok) {
-          verifyMsg.style.color = 'green';
-          verifyMsg.textContent = data.message;
-          setTimeout(() => {
-            window.location.href = '/admin/login.html';
-          }, 2000);
-        } else {
-          verifyMsg.textContent = data.error || 'Verification failed';
-        }
-      } catch (err) {
-        verifyMsg.textContent = 'Network error';
-      }
-    });
+      const data = await res.json();
+      document.getElementById("result").textContent = data.message || data.error;
+    }
   </script>
 </body>
 </html>
