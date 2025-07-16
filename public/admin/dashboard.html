@@ -3,16 +3,50 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Teens Church Admin Dashboard</title>
+  <title>AGC Akowonjo | Teens Church Admin</title>
   <link rel="stylesheet" href="dashboard.css" />
+  <style>
+    .profile-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    .profile-section .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #eee;
+    }
+    .logout-button {
+      background-color: #e74c3c;
+      color: #fff;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+    .logout-button:hover {
+      background-color: #c0392b;
+    }
+  </style>
 </head>
 <body>
   <!-- Navbar -->
   <nav class="navbar">
-    <h1>Teens Church Admin</h1>
+    <h1>AGC Akowonjo Teens Admin</h1>
     <div class="nav-links">
-      <a href="#">Profile</a>
-      <a href="#" onclick="adminLogout()">Logout</a>
+      <div class="profile-section">
+        <img src="/public/assets/profile.png" alt="Admin Avatar" class="avatar" />
+        <div>
+          <h3 id="adminName">Admin</h3>
+          <p>Logged in</p>
+        </div>
+      </div>
+      <button class="logout-button" onclick="adminLogout()">Logout</button>
     </div>
   </nav>
 
@@ -31,7 +65,7 @@
 
     <!-- Main Content -->
     <main class="main-content">
-      <h2>Dashboard Overview</h2>
+      <h2>Welcome, Admin!</h2>
       <div class="cards">
         <div class="card"><h3>Total RSVPs</h3><p id="rsvpCount">0</p></div>
         <div class="card"><h3>Total Prayers</h3><p id="prayerCount">0</p></div>
@@ -85,6 +119,30 @@
           </div>
           <div id="previewList" class="preview-list"></div>
         </div>
+
+        <!-- Profile Panel -->
+<div class="panel" id="profilePanel">
+  <button class="toggle-btn">Edit Profile</button>
+  <div class="panel-content">
+    <form id="profileForm">
+      <div>
+        <label for="adminName">Name</label>
+        <input type="text" id="adminName" name="name" required />
+      </div>
+      <div>
+        <label for="adminEmail">Email</label>
+        <input type="email" id="adminEmail" name="email" required />
+      </div>
+      <div>
+        <label for="adminPassword">New Password</label>
+        <input type="password" id="adminPassword" name="password" placeholder="Leave blank to keep current password" />
+      </div>
+      <button type="submit">Save Changes</button>
+    </form>
+    <p id="profileMsg"></p>
+  </div>
+</div>
+
       </div>
     </main>
   </div>
@@ -122,6 +180,24 @@
     </div>
   </div>
 
+  <script>
+    async function loadAdminProfile() {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+      const res = await fetch('/api/admin/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      document.getElementById('adminName').innerText = data.name || 'Admin';
+    }
+
+    function adminLogout() {
+      localStorage.removeItem('adminToken');
+      window.location.href = 'logout.html';
+    }
+
+    window.onload = loadAdminProfile;
+  </script>
   <script src="dashboard.js"></script>
 </body>
 </html>

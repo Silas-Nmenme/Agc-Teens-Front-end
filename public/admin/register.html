@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Registration | AGC Akowonjo</title>
   <style>
     body {
@@ -125,64 +125,65 @@
     </header>
 
     <div class="error-message" id="errorMsg"></div>
-    <form id="registerForm">
+
+    <form id="registerForm" autocomplete="on">
       <label for="name">Full Name</label>
-      <input type="text" id="name" placeholder="Enter your full name" required>
+      <input type="text" id="name" name="name" placeholder="Enter your full name" autocomplete="name" required>
 
       <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Choose a username" required>
+      <input type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username" required>
 
       <label for="email">Email Address</label>
-      <input type="email" id="email" placeholder="you@example.com" required>
+      <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email" required>
 
       <label for="phone">Phone Number</label>
-      <input type="tel" id="phone" placeholder="080XXXXXXXX" required>
+      <input type="tel" id="phone" name="phone" placeholder="080XXXXXXXX" autocomplete="tel" required>
 
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Create a password" required>
+      <input type="password" id="password" name="password" placeholder="Create a password" autocomplete="new-password" required>
 
       <button type="submit">Register</button>
 
       <div class="footer-link">
-        Already have an account? <a href="public\login.html">Login here</a>
+        Already have an account? <a href="login.html">Login here</a>
       </div>
     </form>
   </div>
 
   <script>
-document.getElementById('registerForm').addEventListener('submit', async function (e) {
-  e.preventDefault();
+    document.getElementById('registerForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
 
-  const name = document.getElementById('name').value.trim();
-  const username = document.getElementById('username').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const password = document.getElementById('password').value;
+      const name = document.getElementById('name').value.trim();
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      errorMsg.textContent = '';
 
-  try {
-    const res = await fetch('https://agc-teens-backend.onrender.com/api/admin/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ name, username, email, phone, password })
+      try {
+        const res = await fetch('https://agc-teens-backend.onrender.com/api/admin/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, email, phone, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorMsg.innerText = data.error || 'Registration failed.';
+          return;
+        }
+
+        alert('Registration successful! Please check your email to verify your account.');
+        localStorage.setItem('token', data.token);
+        window.location.href = '/public/dashboard.html';
+      } catch (err) {
+        errorMsg.innerText = 'Something went wrong.';
+        console.error(err);
+      }
     });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      document.getElementById('errorMsg').innerText = data.error || 'Registration failed.';
-      return;
-    }
-
-    alert('Registration successful!');
-    localStorage.setItem('token', data.token); // Store token if needed
-    window.location.href = '/public/dashboard.html'; // Redirect after success
-  } catch (err) {
-    document.getElementById('errorMsg').innerText = 'Something went wrong.';
-    console.error(err);
-  }
-});
-</script>
+  </script>
 </body>
 </html>

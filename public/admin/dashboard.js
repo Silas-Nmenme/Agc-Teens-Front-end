@@ -370,3 +370,36 @@ fetch('/api/prayer', { headers })
   .then(data => {
     document.getElementById('prayerCount').textContent = data.length;
   });
+
+  document.getElementById('profileForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const token = localStorage.getItem('adminToken');
+
+  const name = document.getElementById('adminName').value;
+  const email = document.getElementById('adminEmail').value;
+  const password = document.getElementById('adminPassword').value;
+
+  try {
+    const res = await fetch('/api/admin/profile', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await res.json();
+    const msg = document.getElementById('profileMsg');
+
+    if (res.ok) {
+      msg.textContent = 'Profile updated successfully!';
+      msg.style.color = 'green';
+    } else {
+      msg.textContent = data.error || 'Failed to update profile';
+      msg.style.color = 'red';
+    }
+  } catch (err) {
+    document.getElementById('profileMsg').textContent = 'Error updating profile.';
+  }
+});
