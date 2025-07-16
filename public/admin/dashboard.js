@@ -403,3 +403,29 @@ fetch('/api/prayer', { headers })
     document.getElementById('profileMsg').textContent = 'Error updating profile.';
   }
 });
+
+async function fetchAdminInfo() {
+  const token = localStorage.getItem('adminToken');
+
+  try {
+    const res = await fetch('/api/admin/me', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      document.getElementById('lastLoginStat').textContent =
+        new Date(data.lastLogin).toLocaleString();
+      document.getElementById('adminName').value = data.name;
+      document.getElementById('adminEmail').value = data.email;
+    } else {
+      console.error(data.error);
+    }
+  } catch (err) {
+    console.error('Failed to load admin info:', err);
+  }
+}
+
+fetchAdminInfo();
