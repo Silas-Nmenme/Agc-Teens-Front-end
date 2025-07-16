@@ -178,7 +178,7 @@
 
         alert('Registration successful! Please check your email to verify your account.');
         localStorage.setItem('token', data.token);
-        window.location.href = '/public/dashboard.html';
+        window.location.href = 'login.html';
       } catch (err) {
         errorMsg.innerText = 'Something went wrong.';
         console.error(err);
