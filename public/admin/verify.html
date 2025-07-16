@@ -55,19 +55,47 @@
   </div>
 
   <script>
-    async function submitCode() {
-      const email = document.getElementById("email").value;
-      const code = document.getElementById("code").value;
+  document.getElementById("verifyForm").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-      const res = await fetch('/api/admin/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
+    const email = document.getElementById("email").value.trim();
+    const code = document.getElementById("code").value.trim();
+    const msgDiv = document.getElementById("verifyMsg");
+
+    msgDiv.textContent = "";
+
+    try {
+      const res = await fetch("https://agc-teens-backend.onrender.com/api/admin/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code }),
       });
 
       const data = await res.json();
-      document.getElementById("result").textContent = data.message || data.error;
+
+      if (!res.ok) {
+        msgDiv.textContent = data.error || "Verification failed.";
+        msgDiv.style.color = "red";
+      } else {
+        msgDiv.textContent = "Verification successful! Redirecting to login...";
+        msgDiv.style.color = "green";
+        setTimeout(() => window.location.href = "login.html", 2000);
+      }
+    } catch (err) {
+      console.error("[VERIFY ERROR]", err);
+      msgDiv.textContent = "Something went wrong. Try again.";
+      msgDiv.style.color = "red";
     }
-  </script>
+  });
+  
+  window.onload = () => {
+    const savedEmail = localStorage.getItem('verifyEmail');
+    if (savedEmail) {
+      document.getElementById('email').value = savedEmail;
+    }
+  };
+
+</script>
+
 </body>
 </html>
