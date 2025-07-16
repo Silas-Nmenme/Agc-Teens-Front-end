@@ -30,7 +30,7 @@ async function submitPrayer(e) {
 
   const name = e.target[0].value.trim();
   const email = e.target[1].value.trim();
-  const message = e.target[2].value.trim();
+  const request = e.target[2].value.trim();
   const messageBox = document.getElementById('prayer-message');
 
   messageBox.textContent = 'Submitting…';
@@ -94,6 +94,7 @@ fetch('/api/admin/prayers', {
     Authorization: `Bearer ${token}` // token from localStorage
   }
 });
+
 
   // Automatically apply system theme on first load
   window.addEventListener('DOMContentLoaded', () => {
