@@ -1,58 +1,89 @@
-<!-- public/verify.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Email Verification</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Verify Email - Admin</title>
   <style>
     body {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; height: 100vh; background: #f3f3f3;
-      font-family: sans-serif; text-align: center;
+      font-family: Arial;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: #f2f2f2;
     }
-    h1 { color: #006666; }
-    .btn {
-      margin-top: 20px;
-      padding: 10px 20px;
-      background: #006666;
-      color: white;
-      text-decoration: none;
+    .verify-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+    }
+    input, button {
+      display: block;
+      width: 100%;
+      margin-top: 1rem;
+      padding: 0.8rem;
       border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #2c3e50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #1c2833;
+    }
+    .message {
+      margin-top: 1rem;
+      color: red;
     }
   </style>
 </head>
 <body>
-
-  <h1>Email Verification</h1>
-  <p id="message">Verifying your email...</p>
+  <div class="verify-box">
+    <h2>Enter Your Verification Code</h2>
+    <form id="verifyForm">
+      <input type="email" id="email" placeholder="Email used for registration" required />
+      <input type="text" id="code" placeholder="6-digit code" required />
+      <button type="submit">Verify</button>
+      <div class="message" id="verifyMsg"></div>
+    </form>
+  </div>
 
   <script>
-    // Parse token from URL
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("token");
+    document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-    if (!token) {
-      document.getElementById("message").innerText = "Invalid verification link.";
-    } else {
-      // Send token to backend
-      fetch(`/api/admin/verify-email?token=${token}`)
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById("message").innerText = "Email verified! Redirecting to homepage...";
-            setTimeout(() => {
-              window.location.href = "app.html";
-            }, 3000);
-          } else {
-            document.getElementById("message").innerText = data.message || "Verification failed.";
-          }
-        })
-        .catch(err => {
-          document.getElementById("message").innerText = "An error occurred during verification.";
-          console.error(err);
+      const email = document.getElementById('email').value;
+      const code = document.getElementById('code').value;
+      const verifyMsg = document.getElementById('verifyMsg');
+
+      try {
+        const res = await fetch('/api/admin/verify-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, code })
         });
-    }
+
+        const data = await res.json();
+
+        if (res.ok) {
+          verifyMsg.style.color = 'green';
+          verifyMsg.textContent = data.message;
+          setTimeout(() => {
+            window.location.href = '/admin/login.html';
+          }, 2000);
+        } else {
+          verifyMsg.textContent = data.error || 'Verification failed';
+        }
+      } catch (err) {
+        verifyMsg.textContent = 'Network error';
+      }
+    });
   </script>
 </body>
 </html>
