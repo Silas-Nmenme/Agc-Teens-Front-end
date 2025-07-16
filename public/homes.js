@@ -30,30 +30,40 @@ async function submitPrayer(e) {
 
   const name = e.target[0].value.trim();
   const email = e.target[1].value.trim();
-  const request = e.target[2].value.trim();
+  const message = e.target[2].value.trim();
+  const messageBox = document.getElementById('prayer-message');
 
-  const messageBox = document.getElementById('prayer-request');
-  messageBox.textContent = 'Submitting...';
+  messageBox.textContent = 'Submitting…';
 
   try {
     const res = await fetch(`${baseUrl}/api/prayer`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, message: request }) //FIXED!
+      body: JSON.stringify({ name, email, request })  //consistent naming
     });
 
-    const data = await res.json();
+    // Try to parse the response safely
+    const contentType = res.headers.get('content-type');
+    let data;
 
-    if (!res.ok) {
-      throw new Error(data.error || 'Prayer request failed.');
+    if (contentType && contentType.includes('application/json')) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      console.warn('Non-JSON response:', text);
+      throw new Error('Server returned unexpected content.');
     }
 
-    messageBox.textContent = data.message || 'Prayer submitted successfully!';
+    if (!res.ok) {
+      throw new Error(data.message || 'Prayer request failed.');
+    }
+
+    messageBox.textContent = data.message || 'Prayer request submitted successfully!';
     e.target.reset();
 
   } catch (err) {
-    console.error('Prayer Error:', err);
-    messageBox.textContent = err.message || 'Failed to submit prayer request.';
+    console.error('Prayer Error:', err.message || err);
+    messageBox.textContent = err.message || 'Something went wrong.';
   }
 }
 
