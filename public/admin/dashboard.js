@@ -179,29 +179,7 @@ async function uploadMedia() {
   }
 }
 
-// Load media files into table
-async function loadMedia() {
-  try {
-    const res = await fetch('/api/media', {
-      credentials: 'include'
-    });
-    const data = await res.json();
 
-    const table = document.getElementById('mediaTable');
-    table.innerHTML = `
-      <tr><th>Filename</th><th>Type</th><th>Uploaded</th><th>Actions</th></tr>
-      ${data.map(file => `
-        <tr>
-          <td>${file.filename}</td>
-          <td>${file.type}</td>
-          <td>${new Date(file.uploadedAt).toLocaleString()}</td>
-          <td><button onclick="deleteMedia('${file._id}')" class="text-red-600 hover:underline">Delete</button></td>
-        </tr>
-      `).join('')}`;
-  } catch (err) {
-    console.error('Failed to load media:', err.message);
-  }
-}
 
 // Delete media file
 async function deleteMedia(id) {

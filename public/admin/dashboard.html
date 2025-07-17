@@ -135,27 +135,27 @@
       </details>
 
       <!-- Media Uploads Panel -->
-      <details id="mediaPanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <summary class="cursor-pointer font-semibold text-xl mb-4">Media Uploads</summary>
-        <div class="border-2 border-dashed border-indigo-500 rounded p-4 mb-4 cursor-pointer" id="dropzone">
-          <p class="text-center text-indigo-600">Drag & drop media files here or click to select</p>
-          <input type="file" id="mediaFiles" accept="image/*,video/*,audio/*" multiple hidden />
-        </div>
-        <div id="previewList" class="grid grid-cols-3 gap-4"></div>
-        <div class="overflow-x-auto max-h-96 mt-4">
-          <table id="mediaTable" class="min-w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
-            <thead class="bg-indigo-600 text-white">
-              <tr>
-                <th class="p-3 text-left">File Name</th>
-                <th class="p-3 text-left">Type</th>
-                <th class="p-3 text-left">Uploaded At</th>
-                <th class="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </details>
+      <form id="mediaUploadForm" class="space-y-4 mb-6">
+  <label class="block text-sm font-medium">Select File</label>
+  <div class="border-2 border-dashed border-indigo-500 rounded p-4 cursor-pointer" id="dropzone">
+    <p class="text-center text-indigo-600">Drag & drop files here or click to select</p>
+    <input type="file" id="mediaFiles" accept="image/*,video/*,audio/*" hidden required />
+  </div>
+
+  <label class="block text-sm font-medium">Description</label>
+  <input type="text" id="mediaDescription" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" placeholder="Enter media description" />
+
+  <label class="block text-sm font-medium">Media Type</label>
+  <select id="mediaType" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" required>
+    <option value="image">Image</option>
+    <option value="video">Video</option>
+    <option value="audio">Audio</option>
+  </select>
+
+  <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
+    Upload Media
+  </button>
+</form>
 
       <!-- Blog Posts Panel -->
       <details id="blogPanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
@@ -360,56 +360,41 @@
     });
 
     // Dropzone for media upload
-    const dropzone = document.getElementById('dropzone');
-    const mediaFilesInput = document.getElementById('mediaFiles');
-    const previewList = document.getElementById('previewList');
+    
+  // Upload media with description and type
+  document.getElementById('mediaUploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
 
-    dropzone.addEventListener('click', () => mediaFilesInput.click());
-    dropzone.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropzone.classList.add('border-indigo-700');
-    });
-    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('border-indigo-700'));
-    dropzone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropzone.classList.remove('border-indigo-700');
-      mediaFilesInput.files = e.dataTransfer.files;
-      showPreviews(mediaFilesInput.files);
-    });
+    const file = document.getElementById('mediaFiles').files[0];
+    const type = document.getElementById('mediaType').value;
+    const description = document.getElementById('mediaDescription').value;
 
-    mediaFilesInput.addEventListener('change', () => {
-      showPreviews(mediaFilesInput.files);
-    });
+    if (!file) return alert('Please select a media file.');
 
-    function showPreviews(files) {
-      previewList.innerHTML = '';
-      Array.from(files).forEach(file => {
-        const fileType = file.type.split('/')[0];
-        let previewElem;
-        if (fileType === 'image') {
-          previewElem = document.createElement('img');
-          previewElem.src = URL.createObjectURL(file);
-          previewElem.className = 'rounded shadow max-h-32 w-full object-cover';
-        } else if (fileType === 'video') {
-          previewElem = document.createElement('video');
-          previewElem.src = URL.createObjectURL(file);
-          previewElem.controls = true;
-          previewElem.className = 'rounded shadow max-h-32 w-full';
-        } else if (fileType === 'audio') {
-          previewElem = document.createElement('audio');
-          previewElem.src = URL.createObjectURL(file);
-          previewElem.controls = true;
-          previewElem.className = 'w-full';
-        } else {
-          previewElem = document.createElement('div');
-          previewElem.textContent = file.name;
-        }
-        const container = document.createElement('div');
-        container.className = 'col-span-1';
-        container.appendChild(previewElem);
-        previewList.appendChild(container);
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    formData.append('description', description);
+
+    try {
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
       });
+
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      console.log('Uploaded:', data);
+
+      document.getElementById('mediaUploadForm').reset();
+      document.getElementById('previewList').innerHTML = '';
+      loadMedia();
+    } catch (err) {
+      console.error('Upload error:', err.message);
+      alert('Failed to upload media');
     }
+  });
 
     // TODO: Implement fetch calls to populate tables and handle edits/deletes
 
