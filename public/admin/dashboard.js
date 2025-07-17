@@ -179,6 +179,41 @@ async function uploadMedia() {
   }
 }
 
+// Load media files into table
+  // Upload media with description and type
+  document.getElementById('mediaUploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const file = document.getElementById('mediaFiles').files[0];
+    const type = document.getElementById('mediaType').value;
+    const description = document.getElementById('mediaDescription').value;
+
+    if (!file) return alert('Please select a media file.');
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    formData.append('description', description);
+
+    try {
+      const res = await fetch('/api/media', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include'
+      });
+
+      if (!res.ok) throw new Error('Upload failed');
+      const data = await res.json();
+      console.log('Uploaded:', data);
+
+      document.getElementById('mediaUploadForm').reset();
+      document.getElementById('previewList').innerHTML = '';
+      loadMedia();
+    } catch (err) {
+      console.error('Upload error:', err.message);
+      alert('Failed to upload media');
+    }
+  });
 
 
 // Delete media file
