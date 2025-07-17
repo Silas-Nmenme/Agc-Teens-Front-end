@@ -163,20 +163,28 @@ async function uploadMedia() {
   formData.append('type', file.type.split('/')[0]); // image, video, audio
 
   try {
-    const res = await fetch('/api/media', {
-      method: 'POST',
-      body: formData,
-      credentials: 'include' // session-based auth
-    });
+  const res = await fetch('/api/media', {
+    method: 'POST',
+    body: formData,
+    credentials: 'include'
+  });
 
-    if (!res.ok) throw new Error('Upload failed');
-    const data = await res.json();
-    console.log('Uploaded:', data);
-    loadMedia(); // refresh table
-  } catch (err) {
-    console.error('Media upload error:', err.message);
-    alert('Media upload failed. Try again.');
+  const text = await res.text(); // get raw response
+
+  // Try to parse JSON if it looks like JSON
+  const data = text ? JSON.parse(text) : null;
+
+  if (!res.ok) {
+    throw new Error(data?.error || 'Upload failed');
   }
+
+  console.log('Uploaded:', data);
+  document.getElementById('mediaUploadForm').reset();
+  loadMedia();
+
+} catch (err) {
+  console.error('Upload error:', err.message);
+  alert('Failed to upload media: ' + err.message);
 }
 
 // Load media files into table
