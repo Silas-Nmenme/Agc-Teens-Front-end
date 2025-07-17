@@ -1,41 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" >
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AGC Akowonjo | Teens Church Admin Dashboard</title>
-  <!-- TailwindCSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Chart.js CDN -->
+  <link rel="stylesheet" href="dashboard.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    /* Custom scrollbar */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background-color: #4B5563; /* Tailwind gray-600 */
-      border-radius: 4px;
-    }
-    /* Dark mode overrides */
-    html.dark {
-      background-color: #1f2937; /* Tailwind gray-800 */
-      color: #e5e7eb; /* Tailwind gray-200 */
-    }
-  </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-200 min-h-screen flex">
-
-  <!-- Sidebar -->
-  <aside id="sidebar" class="w-64 bg-white dark:bg-gray-800 shadow-lg flex flex-col fixed h-full overflow-auto">
-    <div class="p-6 border-b border-gray-200 dark:border-gray-700 flex items-center gap-4">
-      <img src="/public/assets/profile.png" alt="Admin Avatar" class="w-12 h-12 rounded-full object-cover border-2 border-indigo-500" />
+<body>
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <img src="/public/assets/profile.png" alt="Admin Avatar" class="avatar">
       <div>
-        <h2 id="adminName" class="font-semibold text-lg">Admin</h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400">Logged in</p>
+        <h2 id="adminName">Admin</h2>
+        <p class="status">Logged in</p>
       </div>
     </div>
-    <nav class="flex flex-col mt-6 space-y-1 px-4">
+    <nav class="nav">
       <a href="#dashboardSection" class="sidebar-link active">Dashboard Overview</a>
       <a href="#rsvpPanel" class="sidebar-link">RSVPs</a>
       <a href="#prayerPanel" class="sidebar-link">Prayer Requests</a>
@@ -43,373 +24,192 @@
       <a href="#blogPanel" class="sidebar-link">Blog Posts</a>
       <a href="#subscribersPanel" class="sidebar-link">Subscribers</a>
       <a href="#profilePanel" class="sidebar-link">Edit Profile</a>
-      <button id="logoutBtn" class="mt-auto mb-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded font-semibold">Logout</button>
+      <button id="logoutBtn" class="logout">Logout</button>
     </nav>
   </aside>
 
-  <!-- Main content -->
-  <main class="flex-1 ml-64 p-8 max-w-full overflow-auto">
-
-    <!-- Header with theme toggle -->
-    <header class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold tracking-wide">AGC Akowonjo Teens Church Admin</h1>
-      <button id="themeToggle" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
-        Toggle Dark Mode
-      </button>
+  <main class="main">
+    <header class="header">
+      <h1>AGC Akowonjo Teens Church Admin</h1>
+      <button id="themeToggle" class="btn-toggle">Toggle Dark Mode</button>
     </header>
 
-    <!-- Dashboard Overview Cards -->
-    <section id="dashboardSection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-12">
-
-      <div class="card p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
-        <h3 class="text-lg font-semibold mb-2">Total RSVPs</h3>
+    <section id="dashboardSection" class="dashboard-cards">
+      <div class="card">
+        <h3>Total RSVPs</h3>
         <canvas id="rsvpChart" height="100"></canvas>
-        <p id="rsvpCount" class="text-3xl font-bold mt-3">0</p>
+        <p id="rsvpCount">0</p>
       </div>
-
-      <div class="card p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
-        <h3 class="text-lg font-semibold mb-2">Total Prayers</h3>
+      <div class="card">
+        <h3>Total Prayers</h3>
         <canvas id="prayerChart" height="100"></canvas>
-        <p id="prayerCount" class="text-3xl font-bold mt-3">0</p>
+        <p id="prayerCount">0</p>
       </div>
-
-      <div class="card p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
-        <h3 class="text-lg font-semibold mb-2">Total Blogs</h3>
+      <div class="card">
+        <h3>Total Blogs</h3>
         <canvas id="blogChart" height="100"></canvas>
-        <p id="blogCount" class="text-3xl font-bold mt-3">0</p>
+        <p id="blogCount">0</p>
       </div>
-
-      <div class="card p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
-        <h3 class="text-lg font-semibold mb-2">Total Subscribers</h3>
+      <div class="card">
+        <h3>Total Subscribers</h3>
         <canvas id="subscriberChart" height="100"></canvas>
-        <p id="subscriberCount" class="text-3xl font-bold mt-3">0</p>
+        <p id="subscriberCount">0</p>
       </div>
-
-      <div class="card p-6 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition">
-        <h3 class="text-lg font-semibold mb-2">Total Media Files</h3>
+      <div class="card">
+        <h3>Total Media Files</h3>
         <canvas id="mediaChart" height="100"></canvas>
-        <p id="mediaCount" class="text-3xl font-bold mt-3">0</p>
+        <p id="mediaCount">0</p>
       </div>
     </section>
 
-    <!-- Panels -->
-    <section class="space-y-8">
+    <details id="rsvpPanel" class="panel">
+      <summary>RSVPs</summary>
+      <input type="search" id="rsvpSearch" placeholder="Search RSVPs..." class="search">
+      <div class="table-wrapper">
+        <table id="rsvpTable" class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Event</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
 
-      <!-- RSVP Panel -->
-      <details id="rsvpPanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <summary class="cursor-pointer font-semibold text-xl mb-4">RSVPs</summary>
-        <input type="search" id="rsvpSearch" placeholder="Search RSVPs..." class="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:border-gray-600" />
-        <div class="overflow-x-auto max-h-96">
-          <table id="rsvpTable" class="min-w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
-            <thead class="bg-indigo-600 text-white">
-              <tr>
-                <th class="p-3 text-left">Name</th>
-                <th class="p-3 text-left">Email</th>
-                <th class="p-3 text-left">Event</th>
-                <th class="p-3 text-left">Status</th>
-                <th class="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
+    <details id="prayerPanel" class="panel">
+      <summary>Prayer Requests</summary>
+      <input type="search" id="prayerSearch" placeholder="Search prayers..." class="search">
+      <div class="table-wrapper">
+        <table id="prayerTable" class="table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Request</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <details id="mediaPanel" class="panel">
+      <summary>Media Uploads</summary>
+      <form id="mediaUploadForm" class="upload-form">
+        <label>Select File</label>
+        <div class="dropzone" id="dropzone">
+          <p>Drag & drop files here or click to select</p>
+          <input type="file" id="mediaFiles" name="file" accept="image/*,video/*,audio/*">
         </div>
-      </details>
+        <label>Description</label>
+        <input type="text" id="mediaDescription" placeholder="Enter media description">
+        <label>Media Type</label>
+        <select id="mediaType" required>
+          <option value="image">Image</option>
+          <option value="video">Video</option>
+          <option value="audio">Audio</option>
+        </select>
+        <button type="submit">Upload Media</button>
+      </form>
+      <div class="table-wrapper">
+        <table id="mediaTable" class="table">
+          <thead>
+            <tr>
+              <th>Filename</th>
+              <th>Type</th>
+              <th>Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
 
-      <!-- Prayer Panel -->
-      <details id="prayerPanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <summary class="cursor-pointer font-semibold text-xl mb-4">Prayer Requests</summary>
-        <input type="search" id="prayerSearch" placeholder="Search prayers..." class="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:border-gray-600" />
-        <div class="overflow-x-auto max-h-96">
-          <table id="prayerTable" class="min-w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
-            <thead class="bg-indigo-600 text-white">
-              <tr>
-                <th class="p-3 text-left">Name</th>
-                <th class="p-3 text-left">Email</th>
-                <th class="p-3 text-left">Request</th>
-                <th class="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </details>
+    <details id="blogPanel" class="panel">
+      <summary>Blog Posts</summary>
+      <input type="search" id="blogSearch" placeholder="Search blog posts..." class="search">
+      <div class="table-wrapper">
+        <table id="blogPostTable" class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Author</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
 
-      <!-- Media Uploads Panel -->
-      <form id="mediaUploadForm" class="space-y-4 mb-6">
-  <label class="block text-sm font-medium">Select File</label>
-  <div class="border-2 border-dashed border-indigo-500 rounded p-4 cursor-pointer" id="dropzone">
-    <p class="text-center text-indigo-600">Drag & drop files here or click to select</p>
-    <input type="file" id="mediaFiles" name="file" accept="image/*,video/*,audio/*" class="sr-only" />
+    <details id="subscribersPanel" class="panel">
+      <summary>Subscribers</summary>
+      <input type="search" id="subscriberSearch" placeholder="Search subscribers..." class="search">
+      <div class="table-wrapper">
+        <table id="subscribersTable" class="table">
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Subscribed At</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
 
-  </div>
-
-  <label class="block text-sm font-medium">Description</label>
-  <input type="text" id="mediaDescription" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" placeholder="Enter media description" />
-
-  <label class="block text-sm font-medium">Media Type</label>
-  <select id="mediaType" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" required>
-    <option value="image">Image</option>
-    <option value="video">Video</option>
-    <option value="audio">Audio</option>
-  </select>
-
-  <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">
-    Upload Media
-  </button>
-</form>
-
-      <!-- Blog Posts Panel -->
-      <details id="blogPanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <summary class="cursor-pointer font-semibold text-xl mb-4">Blog Posts</summary>
-        <input type="search" id="blogSearch" placeholder="Search blog posts..." class="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:border-gray-600" />
-        <div class="overflow-x-auto max-h-96">
-          <table id="blogPostTable" class="min-w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
-            <thead class="bg-indigo-600 text-white">
-              <tr>
-                <th class="p-3 text-left">Title</th>
-                <th class="p-3 text-left">Author</th>
-                <th class="p-3 text-left">Date</th>
-                <th class="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </details>
-
-      <!-- Subscribers Panel -->
-      <details id="subscribersPanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <summary class="cursor-pointer font-semibold text-xl mb-4">Subscribers</summary>
-        <input type="search" id="subscriberSearch" placeholder="Search subscribers..." class="w-full p-2 mb-4 border rounded dark:bg-gray-700 dark:border-gray-600" />
-        <div class="overflow-x-auto max-h-96">
-          <table id="subscribersTable" class="min-w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
-            <thead class="bg-indigo-600 text-white">
-              <tr>
-                <th class="p-3 text-left">Email</th>
-                <th class="p-3 text-left">Subscribed At</th>
-                <th class="p-3 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </details>
-
-      <!-- Profile Panel -->
-      <details id="profilePanel" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-        <summary class="cursor-pointer font-semibold text-xl mb-4">Edit Profile</summary>
-        <form id="profileForm" class="space-y-4 max-w-md">
-          <div>
-            <label for="profileName" class="block font-semibold mb-1">Name</label>
-            <input type="text" id="profileName" name="name" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" required />
-          </div>
-          <div>
-            <label for="profileEmail" class="block font-semibold mb-1">Email</label>
-            <input type="email" id="profileEmail" name="email" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" required />
-          </div>
-          <div>
-            <label for="profileAvatar" class="block font-semibold mb-1">Avatar</label>
-            <input type="file" id="profileAvatar" name="avatar" accept="image/*" class="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600" />
-          </div>
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded font-semibold">
-            Save Changes
-          </button>
-        </form>
-      </details>
-
-    </section>
+    <details id="profilePanel" class="panel">
+      <summary>Edit Profile</summary>
+      <form id="profileForm" class="profile-form">
+        <label>Name</label>
+        <input type="text" id="profileName" name="name" required>
+        <label>Email</label>
+        <input type="email" id="profileEmail" name="email" required>
+        <label>Avatar</label>
+        <input type="file" id="profileAvatar" name="avatar" accept="image/*">
+        <button type="submit">Save Changes</button>
+      </form>
+    </details>
   </main>
 
-  <!-- Modal Template for Edits -->
-  <dialog id="editModal" class="rounded-lg p-6 bg-white dark:bg-gray-800 shadow-lg w-full max-w-lg">
-    <form method="dialog" class="space-y-4">
-      <h3 id="modalTitle" class="text-xl font-semibold"></h3>
+  <dialog id="editModal" class="modal">
+    <form method="dialog" class="modal-form">
+      <h3 id="modalTitle"></h3>
       <div id="modalContent"></div>
-      <div class="flex justify-end space-x-4 pt-4">
-        <button type="submit" formmethod="dialog" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded">Save</button>
-        <button id="modalCancel" type="button" class="bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-700 rounded px-4 py-2">Cancel</button>
+      <div class="modal-actions">
+        <button type="submit">Save</button>
+        <button id="modalCancel" type="button">Cancel</button>
       </div>
     </form>
   </dialog>
 
+  <script src="dashboard.js"></script>
+
   <script>
-    // Toggle Dark Mode with persistence
-    const themeToggle = document.getElementById('themeToggle');
-    const html = document.documentElement;
-    const storedTheme = localStorage.getItem('theme');
+  const themeToggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
 
-    if (storedTheme === 'dark') {
-      html.classList.add('dark');
-    }
+  // On page load, check localStorage and apply saved theme
+  if (localStorage.getItem('theme') === 'dark') {
+    html.classList.add('dark');
+  }
 
-    themeToggle.addEventListener('click', () => {
-      html.classList.toggle('dark');
-      localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
-    });
-
-    // Sidebar active link highlight based on scroll or click
-    const sidebarLinks = document.querySelectorAll('.sidebar-link');
-    sidebarLinks.forEach(link => {
-      link.addEventListener('click', (e) => {
-        e.preventDefault();
-        sidebarLinks.forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        const targetId = link.getAttribute('href').slice(1);
-        const targetSection = document.getElementById(targetId);
-        if(targetSection) targetSection.scrollIntoView({behavior: 'smooth'});
-      });
-    });
-
-    // Modal handling
-    const editModal = document.getElementById('editModal');
-    const modalCancel = document.getElementById('modalCancel');
-    modalCancel.addEventListener('click', () => editModal.close());
-
-    // Dummy data for charts - replace with real fetch API data
-    const chartColors = ['#4F46E5', '#9333EA', '#F59E0B', '#10B981', '#EF4444'];
-
-    function createChart(ctx, label, data, color) {
-      return new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: label,
-          datasets: [{
-            data: data,
-            backgroundColor: color,
-            borderWidth: 1,
-          }]
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: { position: 'bottom' },
-            tooltip: { enabled: true }
-          }
-        }
-      });
-    }
-
-    // Initialize charts with sample data
-    const rsvpChart = createChart(
-      document.getElementById('rsvpChart').getContext('2d'),
-      ['Confirmed', 'Pending', 'Cancelled'],
-      [45, 20, 10],
-      ['#4F46E5', '#A78BFA', '#E0E7FF']
-    );
-
-    const prayerChart = createChart(
-      document.getElementById('prayerChart').getContext('2d'),
-      ['Answered', 'Pending'],
-      [15, 30],
-      ['#10B981', '#6EE7B7']
-    );
-
-    const blogChart = createChart(
-      document.getElementById('blogChart').getContext('2d'),
-      ['Published', 'Draft'],
-      [25, 5],
-      ['#F59E0B', '#FDE68A']
-    );
-
-    const subscriberChart = createChart(
-      document.getElementById('subscriberChart').getContext('2d'),
-      ['Active', 'Inactive'],
-      [100, 15],
-      ['#9333EA', '#C4B5FD']
-    );
-
-    const mediaChart = createChart(
-      document.getElementById('mediaChart').getContext('2d'),
-      ['Images', 'Videos', 'Audio'],
-      [30, 10, 5],
-      ['#EF4444', '#FCA5A5', '#F87171']
-    );
-
-    // Set counts (replace with API data)
-    document.getElementById('rsvpCount').textContent = '75';
-    document.getElementById('prayerCount').textContent = '45';
-    document.getElementById('blogCount').textContent = '30';
-    document.getElementById('subscriberCount').textContent = '115';
-    document.getElementById('mediaCount').textContent = '45';
-
-    // Table search/filter function
-    function setupSearch(inputId, tableId) {
-      const input = document.getElementById(inputId);
-      const table = document.getElementById(tableId);
-      input.addEventListener('input', () => {
-        const filter = input.value.toLowerCase();
-        const rows = table.tBodies[0].rows;
-        for (let row of rows) {
-          row.style.display = [...row.cells].some(cell =>
-            cell.textContent.toLowerCase().includes(filter)
-          ) ? '' : 'none';
-        }
-      });
-    }
-
-    // Setup searches for all tables
-    setupSearch('rsvpSearch', 'rsvpTable');
-    setupSearch('prayerSearch', 'prayerTable');
-    setupSearch('blogSearch', 'blogPostTable');
-    setupSearch('subscriberSearch', 'subscribersTable');
-
-    // Logout button - simple example
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      // Clear session/local storage or cookies here
-      alert('Logging out...');
-      window.location.href = '/login.html';
-    });
-
-    // Dropzone for media upload
-    
-  // Upload media with description and type
-  document.getElementById('mediaUploadForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const file = document.getElementById('mediaFiles').files[0];
-    const type = document.getElementById('mediaType').value;
-    const description = document.getElementById('mediaDescription').value;
-
-    if (!file) return alert('Please select a media file.');
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('type', type);
-    formData.append('description', description);
-
-    try {
-      const res = await fetch('/api/media', {
-        method: 'POST',
-        body: formData,
-        credentials: 'include'
-      });
-
-      if (!res.ok) throw new Error('Upload failed');
-      const data = await res.json();
-      console.log('Uploaded:', data);
-
-      document.getElementById('mediaUploadForm').reset();
-      document.getElementById('previewList').innerHTML = '';
-      loadMedia();
-    } catch (err) {
-      console.error('Upload error:', err.message);
-      alert('Failed to upload media');
-    }
+  // Toggle button logic
+  themeToggle.addEventListener('click', () => {
+    html.classList.toggle('dark');
+    const isDark = html.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
   });
+</script>
 
-    // TODO: Implement fetch calls to populate tables and handle edits/deletes
-
-  </script>
-
-  <style>
-    /* Sidebar active link styling */
-    .sidebar-link {
-      @apply block px-4 py-3 rounded text-gray-700 dark:text-gray-300 hover:bg-indigo-600 hover:text-white;
-      transition: background-color 0.3s ease;
-    }
-    .sidebar-link.active, .sidebar-link:focus {
-      @apply bg-indigo-600 text-white;
-    }
-  </style>
 </body>
 </html>
