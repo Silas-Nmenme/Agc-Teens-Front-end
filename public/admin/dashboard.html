@@ -1,215 +1,138 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AGC Akowonjo | Teens Church Admin Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-header">
-      <img src="/public/assets/profile.png" alt="Admin Avatar" class="avatar">
-      <div>
-        <h2 id="adminName">Admin</h2>
-        <p class="status">Logged in</p>
+  <div class="navbar">
+    <h2>Admin Dashboard</h2>
+    <div class="nav-links">
+      <div class="admin-profile" onmouseenter="toggleDropdown(true)" onmouseleave="toggleDropdown(false)">
+        <form id="avatarForm" enctype="multipart/form-data">
+          <label for="avatarUpload">
+            <img id="adminAvatar" src="/default-avatar.png" alt="avatar" title="Last login: " />
+          </label>
+          <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display: none;" />
+        </form>
+        <div class="admin-info">
+          <span id="adminDisplayName">Welcome, Admin</span>
+          <small id="adminEmail" class="admin-email"></small>
+          <small id="adminRole" class="admin-role"></small>
+        </div>
+        <div class="dropdown-menu hidden" id="adminDropdown">
+          <a href="#" onclick="togglePanel('profilePanel')">Edit Profile</a>
+          <a href="#" onclick="logoutAdmin()">Logout</a>
+        </div>
       </div>
     </div>
-    <nav class="nav">
-      <a href="#dashboardSection" class="sidebar-link active">Dashboard Overview</a>
-      <a href="#rsvpPanel" class="sidebar-link">RSVPs</a>
-      <a href="#prayerPanel" class="sidebar-link">Prayer Requests</a>
-      <a href="#mediaPanel" class="sidebar-link">Media Uploads</a>
-      <a href="#blogPanel" class="sidebar-link">Blog Posts</a>
-      <a href="#subscribersPanel" class="sidebar-link">Subscribers</a>
-      <a href="#profilePanel" class="sidebar-link">Edit Profile</a>
-      <button id="logoutBtn" class="logout">Logout</button>
-    </nav>
-  </aside>
+  </div>
 
-  <main class="main">
-    <header class="header">
-      <h1>AGC Akowonjo Teens Church Admin</h1>
-      <button id="themeToggle" class="btn-toggle">Toggle Dark Mode</button>
-    </header>
+  <div class="container">
+    <div class="sidebar">
+      <ul>
+        <li><a href="#" onclick="togglePanel('rsvpPanel')"><i class="fa fa-calendar-check"></i> RSVPs</a></li>
+        <li><a href="#" onclick="togglePanel('prayerPanel')"><i class="fa fa-praying-hands"></i> Prayer Requests</a></li>
+        <li><a href="#" onclick="togglePanel('blogPanel')"><i class="fa fa-blog"></i> Blogs</a></li>
+        <li id="mediaMenu"><a href="#" onclick="togglePanel('mediaPanel')"><i class="fa fa-photo-film"></i> Media</a></li>
+        <li><a href="#" onclick="togglePanel('subscribersPanel')"><i class="fa fa-envelope-open"></i> Subscribers</a></li>
+        <li><a href="#" onclick="togglePanel('profilePanel')"><i class="fa fa-user-cog"></i> Admin Profile</a></li>
+      </ul>
+    </div>
 
-    <section id="dashboardSection" class="dashboard-cards">
-      <div class="card">
-        <h3>Total RSVPs</h3>
-        <canvas id="rsvpChart" height="100"></canvas>
-        <p id="rsvpCount">0</p>
+    <div class="main-content">
+      <div class="cards">
+        <div class="card"><h3>RSVPs</h3><p id="rsvpCount">0</p></div>
+        <div class="card"><h3>Prayers</h3><p id="prayerCount">0</p></div>
+        <div class="card"><h3>Blogs</h3><p id="blogCount">0</p></div>
+        <div class="card"><h3>Subscribers</h3><p id="subscriberCount">0</p></div>
       </div>
-      <div class="card">
-        <h3>Total Prayers</h3>
-        <canvas id="prayerChart" height="100"></canvas>
-        <p id="prayerCount">0</p>
-      </div>
-      <div class="card">
-        <h3>Total Blogs</h3>
-        <canvas id="blogChart" height="100"></canvas>
-        <p id="blogCount">0</p>
-      </div>
-      <div class="card">
-        <h3>Total Subscribers</h3>
-        <canvas id="subscriberChart" height="100"></canvas>
-        <p id="subscriberCount">0</p>
-      </div>
-      <div class="card">
-        <h3>Total Media Files</h3>
-        <canvas id="mediaChart" height="100"></canvas>
-        <p id="mediaCount">0</p>
-      </div>
-    </section>
 
-    <details id="rsvpPanel" class="panel">
-      <summary>RSVPs</summary>
-      <input type="search" id="rsvpSearch" placeholder="Search RSVPs..." class="search">
-      <div class="table-wrapper">
-        <table id="rsvpTable" class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Event</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </details>
-
-    <details id="prayerPanel" class="panel">
-      <summary>Prayer Requests</summary>
-      <input type="search" id="prayerSearch" placeholder="Search prayers..." class="search">
-      <div class="table-wrapper">
-        <table id="prayerTable" class="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Request</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </details>
-
-    <details id="mediaPanel" class="panel">
-      <summary>Media Uploads</summary>
-      <form id="mediaUploadForm" class="upload-form">
-        <label>Select File</label>
-        <div class="dropzone" id="dropzone">
-          <p>Drag & drop files here or click to select</p>
-          <input type="file" id="mediaFiles" name="file" accept="image/*,video/*,audio/*">
+      <div id="rsvpPanel" class="panel">
+        <button class="toggle-btn">Toggle RSVPs</button>
+        <div class="panel-content">
+          <table id="rsvpTable"></table>
         </div>
-        <label>Description</label>
-        <input type="text" id="mediaDescription" placeholder="Enter media description">
-        <label>Media Type</label>
-        <select id="mediaType" required>
-          <option value="image">Image</option>
-          <option value="video">Video</option>
-          <option value="audio">Audio</option>
-        </select>
-        <button type="submit">Upload Media</button>
-      </form>
-      <div class="table-wrapper">
-        <table id="mediaTable" class="table">
-          <thead>
-            <tr>
-              <th>Filename</th>
-              <th>Type</th>
-              <th>Uploaded</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
       </div>
-    </details>
 
-    <details id="blogPanel" class="panel">
-      <summary>Blog Posts</summary>
-      <input type="search" id="blogSearch" placeholder="Search blog posts..." class="search">
-      <div class="table-wrapper">
-        <table id="blogPostTable" class="table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Author</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <div id="prayerPanel" class="panel">
+        <button class="toggle-btn">Toggle Prayers</button>
+        <div class="panel-content">
+          <table id="prayerTable"></table>
+        </div>
       </div>
-    </details>
 
-    <details id="subscribersPanel" class="panel">
-      <summary>Subscribers</summary>
-      <input type="search" id="subscriberSearch" placeholder="Search subscribers..." class="search">
-      <div class="table-wrapper">
-        <table id="subscribersTable" class="table">
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Subscribed At</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+      <div id="blogPanel" class="panel">
+        <button class="toggle-btn">Toggle Blogs</button>
+        <div class="panel-content">
+          <table id="blogPostTable"></table>
+        </div>
       </div>
-    </details>
 
-    <details id="profilePanel" class="panel">
-      <summary>Edit Profile</summary>
-      <form id="profileForm" class="profile-form">
-        <label>Name</label>
-        <input type="text" id="profileName" name="name" required>
-        <label>Email</label>
-        <input type="email" id="profileEmail" name="email" required>
-        <label>Avatar</label>
-        <input type="file" id="profileAvatar" name="avatar" accept="image/*">
+      <div id="mediaPanel" class="panel">
+        <button class="toggle-btn">Toggle Media</button>
+        <div class="panel-content">
+          <table id="mediaTable"></table>
+        </div>
+      </div>
+
+      <div id="subscribersPanel" class="panel">
+        <button class="toggle-btn">Toggle Subscribers</button>
+        <div class="panel-content">
+          <table id="subscribersTable"></table>
+        </div>
+      </div>
+
+      <div id="profilePanel" class="panel">
+        <h3>Admin Profile</h3>
+        <p>Last Login: <span id="lastLoginStat"></span></p>
+        <form id="profileForm">
+          <label for="adminName">Name</label>
+          <input type="text" id="adminName" required />
+
+          <label for="adminEmail">Email</label>
+          <input type="email" id="adminEmail" required />
+
+          <label for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" placeholder="Leave blank to keep current" />
+
+          <button type="submit">Update Profile</button>
+          <p id="profileMsg"></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="editModal" class="modal hidden">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modalTitle"></h2>
+      <form id="editForm">
+        <input type="hidden" id="editId" />
+        <div>
+          <label>Name</label>
+          <input type="text" id="editName" />
+        </div>
+        <div>
+          <label>Email</label>
+          <input type="email" id="editEmail" />
+        </div>
+        <div id="eventGroup">
+          <label>Event</label>
+          <input type="text" id="editEvent" />
+        </div>
+        <div id="requestGroup">
+          <label>Prayer Request</label>
+          <textarea id="editRequest"></textarea>
+        </div>
         <button type="submit">Save Changes</button>
       </form>
-    </details>
-  </main>
-
-  <dialog id="editModal" class="modal">
-    <form method="dialog" class="modal-form">
-      <h3 id="modalTitle"></h3>
-      <div id="modalContent"></div>
-      <div class="modal-actions">
-        <button type="submit">Save</button>
-        <button id="modalCancel" type="button">Cancel</button>
-      </div>
-    </form>
-  </dialog>
+    </div>
+  </div>
 
   <script src="dashboard.js"></script>
-
-  <script>
-  const themeToggle = document.getElementById('themeToggle');
-  const html = document.documentElement;
-
-  // On page load, check localStorage and apply saved theme
-  if (localStorage.getItem('theme') === 'dark') {
-    html.classList.add('dark');
-  }
-
-  // Toggle button logic
-  themeToggle.addEventListener('click', () => {
-    html.classList.toggle('dark');
-    const isDark = html.classList.contains('dark');
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-  });
-</script>
-
 </body>
 </html>
