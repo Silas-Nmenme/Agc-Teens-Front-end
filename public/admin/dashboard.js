@@ -153,9 +153,38 @@ async function deleteSubscriber(id) {
 }
 
 // Media
+// Upload Media (single file example)
+async function uploadMedia() {
+  const file = mediaFilesInput.files[0];
+  if (!file) return alert('Please select a media file.');
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('type', file.type.split('/')[0]); // image, video, audio
+
+  try {
+    const res = await fetch('/api/media', {
+      method: 'POST',
+      body: formData,
+      credentials: 'include' // session-based auth
+    });
+
+    if (!res.ok) throw new Error('Upload failed');
+    const data = await res.json();
+    console.log('Uploaded:', data);
+    loadMedia(); // refresh table
+  } catch (err) {
+    console.error('Media upload error:', err.message);
+    alert('Media upload failed. Try again.');
+  }
+}
+
+// Load media files into table
 async function loadMedia() {
   try {
-    const res = await fetch('/api/media');
+    const res = await fetch('/api/media', {
+      credentials: 'include'
+    });
     const data = await res.json();
 
     const table = document.getElementById('mediaTable');
@@ -166,19 +195,33 @@ async function loadMedia() {
           <td>${file.filename}</td>
           <td>${file.type}</td>
           <td>${new Date(file.uploadedAt).toLocaleString()}</td>
-          <td><button onclick="deleteMedia('${file._id}')">Delete</button></td>
+          <td><button onclick="deleteMedia('${file._id}')" class="text-red-600 hover:underline">Delete</button></td>
         </tr>
       `).join('')}`;
   } catch (err) {
-    console.error('Failed to load media', err);
+    console.error('Failed to load media:', err.message);
   }
 }
 
+// Delete media file
 async function deleteMedia(id) {
-  if (!confirm('Delete this media file?')) return;
-  await fetch(`/api/media/${id}`, { method: 'DELETE' });
-  loadMedia();
+  if (!confirm('Are you sure you want to delete this media file?')) return;
+
+  try {
+    const res = await fetch(`/api/media/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    if (!res.ok) throw new Error('Delete failed');
+    console.log('Deleted:', await res.json());
+    loadMedia();
+  } catch (err) {
+    console.error('Media delete error:', err.message);
+    alert('Failed to delete file.');
+  }
 }
+
 
 // Toggle buttons bind data loaders
 
@@ -341,8 +384,19 @@ form.addEventListener('submit', async (e) => {
 });
 
 function logoutAdmin() {
-  localStorage.removeItem('adminToken'); // Remove the token
-  window.location.href = '/admin/login.html'; // Redirect to login
+  fetch('/api/admin/logout', {
+    method: 'POST',
+    credentials: 'include' //important to include session cookie
+  })
+  .then(res => res.json())
+  .then(data => {
+    console.log(data.message);
+    // Optional: show a toast message here
+    window.location.href = '/login.html'; // or wherever your login page is
+  })
+  .catch(err => {
+    console.error('Logout error:', err);
+  });
 }
 
 const token = localStorage.getItem('adminToken');

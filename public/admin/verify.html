@@ -39,7 +39,7 @@
     }
     .message {
       margin-top: 1rem;
-      color: red;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -55,47 +55,41 @@
   </div>
 
   <script>
-  document.getElementById("verifyForm").addEventListener("submit", async function(e) {
-    e.preventDefault();
+    document.getElementById("verifyForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-    const email = document.getElementById("email").value.trim();
-    const code = document.getElementById("code").value.trim();
-    const msgDiv = document.getElementById("verifyMsg");
+      const email = document.getElementById("email").value.trim();
+      const code = document.getElementById("code").value.trim();
+      const verifyMsg = document.getElementById("verifyMsg");
+      verifyMsg.textContent = "";
 
-    msgDiv.textContent = "";
+      try {
+        const res = await fetch("https://agc-teens-backend.onrender.com/api/admin/verify-code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, code }),
+        });
 
-    try {
-      const res = await fetch("https://agc-teens-backend.onrender.com/api/admin/verify-code", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
-      });
+        const data = await res.json();
 
-      const data = await res.json();
+        if (!res.ok) {
+          verifyMsg.textContent = data.error || "Verification failed.";
+          verifyMsg.style.color = "red";
+          return;
+        }
 
-      if (!res.ok) {
-        msgDiv.textContent = data.error || "Verification failed.";
-        msgDiv.style.color = "red";
-      } else {
-        msgDiv.textContent = "Verification successful! Redirecting to login...";
-        msgDiv.style.color = "green";
-        setTimeout(() => window.location.href = "login.html", 2000);
+        verifyMsg.textContent = "✅ Verification successful! Redirecting...";
+        verifyMsg.style.color = "green";
+
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 2000);
+      } catch (err) {
+        console.error("Verification error:", err);
+        verifyMsg.textContent = "Something went wrong. Try again.";
+        verifyMsg.style.color = "red";
       }
-    } catch (err) {
-      console.error("[VERIFY ERROR]", err);
-      msgDiv.textContent = "Something went wrong. Try again.";
-      msgDiv.style.color = "red";
-    }
-  });
-
-  window.onload = () => {
-    const savedEmail = localStorage.getItem('verifyEmail');
-    if (savedEmail) {
-      document.getElementById('email').value = savedEmail;
-    }
-  };
-
-</script>
-
+    });
+  </script>
 </body>
 </html>
