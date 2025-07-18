@@ -184,3 +184,111 @@ async function fetchAdminInfo() {
 const styleTag = document.createElement("style");
 styleTag.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
 document.head.appendChild(styleTag);
+
+async function loadRSVPs() {
+  try {
+    const res = await fetch("/api/admin/rsvp", { headers: authHeaders });
+    const data = await res.json();
+
+    const container = document.getElementById("rsvpList");
+    container.innerHTML = "";
+
+    data.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "rsvp-item";
+      div.innerHTML = `<strong>${index + 1}. ${item.name}</strong> — ${item.email}`;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error loading RSVPs:", err);
+  }
+}
+
+async function loadPrayers() {
+  try {
+    const res = await fetch("/api/admin/prayers", { headers: authHeaders });
+    const data = await res.json();
+
+    const container = document.getElementById("prayerList");
+    container.innerHTML = "";
+
+    data.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "prayer-item";
+      div.innerHTML = `<strong>${index + 1}. ${item.name}</strong><br><em>${item.email || 'No email'}</em><p>${item.message}</p>`;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error loading prayers:", err);
+  }
+}
+
+async function loadBlogs() {
+  try {
+    const res = await fetch("/api/blogs", { headers: authHeaders });
+    const data = await res.json();
+
+    const container = document.getElementById("blogList");
+    container.innerHTML = "";
+
+    data.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "blog-item";
+      div.innerHTML = `<h4>${index + 1}. ${item.title}</h4><p>${item.content}</p>`;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error loading blogs:", err);
+  }
+}
+
+async function loadSubscribers() {
+  try {
+    const res = await fetch("/api/admin/subscribers", { headers: authHeaders });
+    const data = await res.json();
+
+    const container = document.getElementById("subscriberList");
+    container.innerHTML = "";
+
+    data.forEach((sub, index) => {
+      const div = document.createElement("div");
+      div.className = "subscriber-item";
+      div.innerHTML = `${index + 1}. ${sub.email}`;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error loading subscribers:", err);
+  }
+}
+
+async function loadMedia() {
+  try {
+    const res = await fetch("/api/media", { headers: authHeaders });
+    const data = await res.json();
+
+    const container = document.getElementById("mediaList");
+    container.innerHTML = "";
+
+    data.forEach((media, index) => {
+      const ext = media.filename.split('.').pop().toLowerCase();
+      let mediaTag = "";
+
+      if (['jpg', 'png', 'jpeg', 'gif'].includes(ext)) {
+        mediaTag = `<img src="/${media.path}" width="200" />`;
+      } else if (['mp4', 'mov'].includes(ext)) {
+        mediaTag = `<video src="/${media.path}" width="300" controls></video>`;
+      } else if (['mp3', 'wav'].includes(ext)) {
+        mediaTag = `<audio src="/${media.path}" controls></audio>`;
+      } else {
+        mediaTag = `<a href="/${media.path}" target="_blank">Download</a>`;
+      }
+
+      const div = document.createElement("div");
+      div.className = "media-item";
+      div.innerHTML = `<strong>${index + 1}. ${media.filename}</strong><br>${mediaTag}`;
+      container.appendChild(div);
+    });
+  } catch (err) {
+    console.error("Error loading media:", err);
+  }
+}
