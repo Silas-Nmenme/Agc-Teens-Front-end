@@ -410,3 +410,78 @@ body.dark-mode .admin-dropdown .dropdown-menu a:hover {
 .hidden {
   display: none;
 }
+.rsvp-item,
+.prayer-item,
+.blog-item,
+.subscriber-item,
+.media-item {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  position: relative;
+}
+
+body.dark-mode .rsvp-item,
+body.dark-mode .prayer-item,
+body.dark-mode .blog-item,
+body.dark-mode .subscriber-item,
+body.dark-mode .media-item {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+.action-buttons {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-buttons button {
+  padding: 0.3rem 0.6rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.action-buttons .edit-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.action-buttons .delete-btn {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.panel input[type="search"] {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+body.dark-mode .panel input[type="search"] {
+  background: #2a2a2a;
+  border-color: #555;
+  color: #eee;
+}
+
+#mediaPreview {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px dashed #ccc;
+  border-radius: 6px;
+  text-align: center;
+  background-color: #f9f9f9;
+}
+
+body.dark-mode #mediaPreview {
+  background-color: #2a2a2a;
+  border-color: #555;
+}

@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard</title>
-  <link rel="stylesheet" href="dashboard.css" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="dashboard.css"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 </head>
 <body>
   <div class="navbar">
@@ -14,9 +14,9 @@
       <div class="admin-profile" onmouseenter="toggleDropdown(true)" onmouseleave="toggleDropdown(false)">
         <form id="avatarForm" enctype="multipart/form-data">
           <label for="avatarUpload">
-            <img id="adminAvatar" src="/default-avatar.png" alt="avatar" title="Last login: " />
+            <img id="adminAvatar" src="/default-avatar.png" alt="avatar" title="Last login:" />
           </label>
-          <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display: none;" />
+          <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display:none;" />
         </form>
         <div class="admin-info">
           <span id="adminDisplayName">Welcome, Admin</span>
@@ -35,9 +35,9 @@
     <div class="sidebar">
       <ul>
         <li><a href="#" onclick="togglePanel('rsvpPanel')"><i class="fa fa-calendar-check"></i> RSVPs</a></li>
-        <li><a href="#" onclick="togglePanel('prayerPanel')"><i class="fa fa-praying-hands"></i> Prayer Requests</a></li>
+        <li><a href="#" onclick="togglePanel('prayerPanel')"><i class="fa fa-praying-hands"></i> Prayers</a></li>
         <li><a href="#" onclick="togglePanel('blogPanel')"><i class="fa fa-blog"></i> Blogs</a></li>
-        <li id="mediaMenu"><a href="#" onclick="togglePanel('mediaPanel')"><i class="fa fa-photo-film"></i> Media</a></li>
+        <li><a href="#" onclick="togglePanel('mediaPanel')"><i class="fa fa-photo-film"></i> Media</a></li>
         <li><a href="#" onclick="togglePanel('subscribersPanel')"><i class="fa fa-envelope-open"></i> Subscribers</a></li>
         <li><a href="#" onclick="togglePanel('profilePanel')"><i class="fa fa-user-cog"></i> Admin Profile</a></li>
       </ul>
@@ -51,66 +51,69 @@
         <div class="card"><h3>Subscribers</h3><p id="subscriberCount">0</p></div>
       </div>
 
-      <!-- RSVP Panel Update -->
-<div id="rsvpPanel" class="panel">
-  <button class="toggle-btn">Toggle RSVPs</button>
-  <div class="panel-content">
-    <input type="text" id="rsvpSearch" placeholder="Search RSVP by name/email" />
-    <div id="rsvpList"></div>
-  </div>
-</div>
+      <!-- RSVP PANEL -->
+      <div id="rsvpPanel" class="panel">
+        <button class="toggle-btn">Toggle RSVPs</button>
+        <div class="panel-content">
+          <input type="text" id="rsvpSearch" placeholder="Search RSVPs..." />
+          <table id="rsvpTable"></table>
+          <div id="rsvpList"></div>
+        </div>
+      </div>
 
-<!-- Prayer Panel Update -->
-<div id="prayerPanel" class="panel">
-  <button class="toggle-btn">Toggle Prayers</button>
-  <div class="panel-content">
-    <div id="prayerList"></div>
-  </div>
-</div>
+      <!-- PRAYER PANEL -->
+      <div id="prayerPanel" class="panel">
+        <button class="toggle-btn">Toggle Prayers</button>
+        <div class="panel-content">
+          <table id="prayerTable"></table>
+          <div id="prayerList"></div>
+        </div>
+      </div>
 
-<!-- Blog Panel Update -->
-<div id="blogPanel" class="panel">
-  <button class="toggle-btn">Toggle Blogs</button>
-  <div class="panel-content">
-    <div id="blogList"></div>
-  </div>
-</div>
+      <!-- BLOG PANEL -->
+      <div id="blogPanel" class="panel">
+        <button class="toggle-btn">Toggle Blogs</button>
+        <div class="panel-content">
+          <table id="blogPostTable"></table>
+          <div id="blogList"></div>
+        </div>
+      </div>
 
-<!-- Media Panel Update -->
-<div id="mediaPanel" class="panel">
-  <button class="toggle-btn">Toggle Media</button>
-  <div class="panel-content">
-    <form id="mediaUploadForm" enctype="multipart/form-data">
-      <input type="file" id="mediaFile" accept="image/*,video/*,audio/*" required />
-      <button type="submit">Upload</button>
-    </form>
-    <div id="mediaPreview"></div>
-    <div id="mediaList"></div>
-  </div>
-</div>
+      <!-- MEDIA PANEL -->
+      <div id="mediaPanel" class="panel">
+        <button class="toggle-btn">Toggle Media</button>
+        <div class="panel-content">
+          <form id="mediaUploadForm" enctype="multipart/form-data">
+  <input type="file" id="mediaFile" name="file" required />
+  <div id="mediaPreview"></div>
+  <button type="submit">Upload Media</button>
+</form>
 
-<!-- Subscribers Panel Update -->
-<div id="subscribersPanel" class="panel">
-  <button class="toggle-btn">Toggle Subscribers</button>
-  <div class="panel-content">
-    <input type="text" id="subscriberSearch" placeholder="Search by email..." />
-    <div id="subscriberList"></div>
-  </div>
-</div>
+          <div id="mediaList"></div>
+        </div>
+      </div>
 
+      <!-- SUBSCRIBERS PANEL -->
+      <div id="subscribersPanel" class="panel">
+        <button class="toggle-btn">Toggle Subscribers</button>
+        <div class="panel-content">
+          <input type="text" id="subscriberSearch" placeholder="Search subscribers..." />
+          <table id="subscribersTable"></table>
+          <div id="subscriberList"></div>
+        </div>
+      </div>
+
+      <!-- PROFILE PANEL -->
       <div id="profilePanel" class="panel">
         <h3>Admin Profile</h3>
         <p>Last Login: <span id="lastLoginStat"></span></p>
         <form id="profileForm">
           <label for="adminName">Name</label>
           <input type="text" id="adminName" required />
-
           <label for="adminEmail">Email</label>
-          <input type="email" id="adminEmail" required />
-
+          <input type="email" id="adminEmailInput" required />
           <label for="adminPassword">Password</label>
           <input type="password" id="adminPassword" placeholder="Leave blank to keep current" />
-
           <button type="submit">Update Profile</button>
           <p id="profileMsg"></p>
         </form>
@@ -118,6 +121,7 @@
     </div>
   </div>
 
+  <!-- EDIT MODAL -->
   <div id="editModal" class="modal hidden">
     <div class="modal-content">
       <span class="close" onclick="closeModal()">&times;</span>
