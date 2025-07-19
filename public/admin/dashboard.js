@@ -44,45 +44,88 @@ window.onload = () => {
       setupSidebarLinks();
       bindToggleButtons();
       setupDarkModeToggle();
+      setupMediaUpload();
+      setupSearchFilters();
     })
     .finally(() => hideLoading());
 };
 
-// ============================
-// Loading Spinner
-// ============================
-function showLoading() {
-  const spinner = document.createElement("div");
-  spinner.id = "loadingSpinner";
-  spinner.style.position = "fixed";
-  spinner.style.top = "0";
-  spinner.style.left = "0";
-  spinner.style.width = "100%";
-  spinner.style.height = "100%";
-  spinner.style.backgroundColor = "rgba(255,255,255,0.8)";
-  spinner.style.zIndex = "9999";
-  spinner.style.display = "flex";
-  spinner.style.justifyContent = "center";
-  spinner.style.alignItems = "center";
-  spinner.innerHTML = `<div style="border: 6px solid #f3f3f3; border-top: 6px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>`;
-  document.body.appendChild(spinner);
-}
-
-function hideLoading() {
-  const spinner = document.getElementById("loadingSpinner");
-  if (spinner) spinner.remove();
-}
 
 // ============================
-// Toast Notification
+// Media Upload Handling
 // ============================
-function showToast(message, type = "info") {
-  const toast = document.createElement("div");
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.classList.add("show"), 100);
-  setTimeout(() => toast.remove(), 4000);
+function setupMediaUpload() {
+  const mediaInput = document.getElementById("mediaFile");
+  const preview = document.getElementById("mediaPreview");
+  const form = document.getElementById("mediaUploadForm");
+
+  if (!mediaInput || !preview || !form) return;
+
+  mediaInput.addEventListener("change", function (e) {
+    const file = e.target.files[0];
+    preview.innerHTML = "";
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const ext = file.name.split('.').pop().toLowerCase();
+
+    if (["jpg", "jpeg", "png", "gif"].includes(ext)) {
+      preview.innerHTML = `<img src="${url}" width="200" />`;
+    } else if (["mp4", "mov"].includes(ext)) {
+      preview.innerHTML = `<video src="${url}" width="300" controls></video>`;
+    } else if (["mp3", "wav"].includes(ext)) {
+      preview.innerHTML = `<audio src="${url}" controls></audio>`;
+    } else {
+      preview.innerHTML = `<p>No preview available</p>`;
+    }
+  });
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const file = mediaInput.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      await fetch("/api/media/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      showToast("Media uploaded", "success");
+      loadMedia();
+    } catch (err) {
+      showToast("Upload failed", "error");
+    }
+  });
+}
+
+// ============================
+// Search Filter Handling
+// ============================
+function setupSearchFilters() {
+  const rsvpSearch = document.getElementById("rsvpSearch");
+  const subscriberSearch = document.getElementById("subscriberSearch");
+
+  if (rsvpSearch) {
+    rsvpSearch.addEventListener("input", () => {
+      const query = rsvpSearch.value.toLowerCase();
+      document.querySelectorAll(".rsvp-item").forEach((item) => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query) ? "block" : "none";
+      });
+    });
+  }
+
+  if (subscriberSearch) {
+    subscriberSearch.addEventListener("input", () => {
+      const query = subscriberSearch.value.toLowerCase();
+      document.querySelectorAll(".subscriber-item").forEach((item) => {
+        const text = item.textContent.toLowerCase();
+        item.style.display = text.includes(query) ? "block" : "none";
+      });
+    });
+  }
 }
 
 // ============================
