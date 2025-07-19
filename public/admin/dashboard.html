@@ -51,40 +51,52 @@
         <div class="card"><h3>Subscribers</h3><p id="subscriberCount">0</p></div>
       </div>
 
-      <div id="rsvpPanel" class="panel">
-        <button class="toggle-btn">Toggle RSVPs</button>
-        <div class="panel-content">
-          <table id="rsvpTable"></table>
-        </div>
-      </div>
+      <!-- RSVP Panel Update -->
+<div id="rsvpPanel" class="panel">
+  <button class="toggle-btn">Toggle RSVPs</button>
+  <div class="panel-content">
+    <input type="text" id="rsvpSearch" placeholder="Search RSVP by name/email" />
+    <div id="rsvpList"></div>
+  </div>
+</div>
 
-      <div id="prayerPanel" class="panel">
-        <button class="toggle-btn">Toggle Prayers</button>
-        <div class="panel-content">
-          <table id="prayerTable"></table>
-        </div>
-      </div>
+<!-- Prayer Panel Update -->
+<div id="prayerPanel" class="panel">
+  <button class="toggle-btn">Toggle Prayers</button>
+  <div class="panel-content">
+    <div id="prayerList"></div>
+  </div>
+</div>
 
-      <div id="blogPanel" class="panel">
-        <button class="toggle-btn">Toggle Blogs</button>
-        <div class="panel-content">
-          <table id="blogPostTable"></table>
-        </div>
-      </div>
+<!-- Blog Panel Update -->
+<div id="blogPanel" class="panel">
+  <button class="toggle-btn">Toggle Blogs</button>
+  <div class="panel-content">
+    <div id="blogList"></div>
+  </div>
+</div>
 
-      <div id="mediaPanel" class="panel">
-        <button class="toggle-btn">Toggle Media</button>
-        <div class="panel-content">
-          <table id="mediaTable"></table>
-        </div>
-      </div>
+<!-- Media Panel Update -->
+<div id="mediaPanel" class="panel">
+  <button class="toggle-btn">Toggle Media</button>
+  <div class="panel-content">
+    <form id="mediaUploadForm" enctype="multipart/form-data">
+      <input type="file" id="mediaFile" accept="image/*,video/*,audio/*" required />
+      <button type="submit">Upload</button>
+    </form>
+    <div id="mediaPreview"></div>
+    <div id="mediaList"></div>
+  </div>
+</div>
 
-      <div id="subscribersPanel" class="panel">
-        <button class="toggle-btn">Toggle Subscribers</button>
-        <div class="panel-content">
-          <table id="subscribersTable"></table>
-        </div>
-      </div>
+<!-- Subscribers Panel Update -->
+<div id="subscribersPanel" class="panel">
+  <button class="toggle-btn">Toggle Subscribers</button>
+  <div class="panel-content">
+    <input type="text" id="subscriberSearch" placeholder="Search by email..." />
+    <div id="subscriberList"></div>
+  </div>
+</div>
 
       <div id="profilePanel" class="panel">
         <h3>Admin Profile</h3>
