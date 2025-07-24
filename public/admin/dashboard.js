@@ -62,10 +62,10 @@ function togglePanel(panelId) {
 // ============================
 async function loadDashboardStats() {
   try {
-    const rsvpRes = await fetch("/api/rsvps/count", { headers: authHeaders });
-    const prayerRes = await fetch("/api/prayers/count", { headers: authHeaders });
-    const blogRes = await fetch("/api/blogs/count", { headers: authHeaders });
-    const subRes = await fetch("/api/subscribers/count", { headers: authHeaders });
+    const rsvpRes = await fetch("/api/rsvp/count", { headers: authHeaders });
+    const prayerRes = await fetch("/api/prayer/count", { headers: authHeaders });
+    const blogRes = await fetch("/api/blog/count", { headers: authHeaders });
+    const subRes = await fetch("/api/subscriber/count", { headers: authHeaders });
 
     const rsvp = await rsvpRes.json();
     const prayer = await prayerRes.json();
