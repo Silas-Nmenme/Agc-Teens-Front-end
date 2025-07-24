@@ -104,25 +104,24 @@ async function loadDashboardStats() {
 async function fetchAdminInfo() {
   try {
     const res = await fetch("/api/admin/me", { headers: authHeaders });
-    let data;
-    try {
-      data = await res.json();
-    } catch {
-      throw new Error("Invalid response from /api/admin/me. Is your backend running and returning JSON?");
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Invalid response from /api/admin/me: ${text}`);
     }
-    if (res.ok) {
-      currentAdminRole = data.role || "user";
-      currentAdminName = data.name || "Admin";
-      const nameEl = document.getElementById("adminDisplayName");
-      const emailEl = document.getElementById("adminEmail");
-      const roleEl = document.getElementById("adminRole");
-      if (nameEl) nameEl.textContent = `Welcome, ${currentAdminName}`;
-      if (emailEl) emailEl.textContent = data.email || "";
-      if (roleEl) roleEl.textContent = data.role || "";
+
+    const data = await res.json();
+
+    document.getElementById("adminDisplayName").textContent = `Welcome, ${data.name}`;
+    document.getElementById("adminEmail").textContent = data.email;
+    document.getElementById("adminRole").textContent = data.role;
+
+    if (data.lastLogin) {
+      document.getElementById("lastLoginStat").textContent = new Date(data.lastLogin).toLocaleString();
     }
   } catch (err) {
     console.error("Fetch admin info error:", err);
-    showToast(err.message || "Failed to fetch admin info", "error");
+    showToast("Failed to load admin profile", "error");
   }
 }
 
