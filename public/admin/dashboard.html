@@ -14,7 +14,7 @@
       <div class="admin-profile" onmouseenter="toggleDropdown(true)" onmouseleave="toggleDropdown(false)">
         <form id="avatarForm" enctype="multipart/form-data">
           <label for="avatarUpload">
-            <img id="adminAvatar" src="/default-avatar.png" alt="avatar" title="Last login:" />
+            <img id="adminAvatar" src="/default-avatar.png" alt="Admin avatar" title="Last login:" />
           </label>
           <input type="file" id="avatarUpload" name="avatar" accept="image/*" style="display:none;" />
         </form>
@@ -53,53 +53,48 @@
 
       <!-- RSVP PANEL -->
       <div id="rsvpPanel" class="panel">
-        <button class="toggle-btn">Toggle RSVPs</button>
+        <button class="toggle-btn" type="button">Toggle RSVPs</button>
         <div class="panel-content">
           <input type="text" id="rsvpSearch" placeholder="Search RSVPs..." />
-          <table id="rsvpTable"></table>
           <div id="rsvpList"></div>
         </div>
       </div>
 
       <!-- PRAYER PANEL -->
       <div id="prayerPanel" class="panel">
-        <button class="toggle-btn">Toggle Prayers</button>
+        <button class="toggle-btn" type="button">Toggle Prayers</button>
         <div class="panel-content">
-          <table id="prayerTable"></table>
           <div id="prayerList"></div>
         </div>
       </div>
 
       <!-- BLOG PANEL -->
       <div id="blogPanel" class="panel">
-        <button class="toggle-btn">Toggle Blogs</button>
+        <button class="toggle-btn" type="button">Toggle Blogs</button>
         <div class="panel-content">
-          <table id="blogPostTable"></table>
           <div id="blogList"></div>
         </div>
       </div>
 
       <!-- MEDIA PANEL -->
       <div id="mediaPanel" class="panel">
-        <button class="toggle-btn">Toggle Media</button>
+        <button class="toggle-btn" type="button">Toggle Media</button>
         <div class="panel-content">
           <form id="mediaUploadForm" enctype="multipart/form-data">
-  <label for="mediaFile">Upload Media File</label>
-  <input type="file" id="mediaFile" name="file" required title="Select a media file to upload" placeholder="Choose file" />
-  <div id="mediaPreview"></div>
-  <button type="submit">Upload Media</button>
-</form>
-
+            <label for="mediaFile">Upload Media File</label>
+            <input type="file" id="mediaFile" name="file" required title="Select a media file to upload" placeholder="Choose file" />
+            <div id="mediaPreview"></div>
+            <button type="submit">Upload Media</button>
+          </form>
           <div id="mediaList"></div>
         </div>
       </div>
 
       <!-- SUBSCRIBERS PANEL -->
       <div id="subscribersPanel" class="panel">
-        <button class="toggle-btn">Toggle Subscribers</button>
+        <button class="toggle-btn" type="button">Toggle Subscribers</button>
         <div class="panel-content">
           <input type="text" id="subscriberSearch" placeholder="Search subscribers..." />
-          <table id="subscribersTable"></table>
           <div id="subscriberList"></div>
         </div>
       </div>
@@ -110,11 +105,11 @@
         <p>Last Login: <span id="lastLoginStat"></span></p>
         <form id="profileForm">
           <label for="adminName">Name</label>
-          <input type="text" id="adminName" required />
-          <label for="adminEmail">Email</label>
-          <input type="email" id="adminEmailInput" required title="Enter your email address" placeholder="Email address" />
+          <input type="text" id="adminName" name="adminName" required />
+          <label for="adminEmailInput">Email</label>
+          <input type="email" id="adminEmailInput" name="adminEmail" required title="Enter your email address" placeholder="Email address" />
           <label for="adminPassword">Password</label>
-          <input type="password" id="adminPassword" placeholder="Leave blank to keep current" />
+          <input type="password" id="adminPassword" name="adminPassword" placeholder="Leave blank to keep current" />
           <button type="submit">Update Profile</button>
           <p id="profileMsg"></p>
         </form>
@@ -123,27 +118,27 @@
   </div>
 
   <!-- EDIT MODAL -->
-  <div id="editModal" class="modal hidden">
+  <div id="editModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
+      <button type="button" class="close" aria-label="Close" onclick="closeModal()">&times;</button>
       <h2 id="modalTitle"></h2>
-      <form id="editForm">
+      <form id="editForm" autocomplete="off">
         <input type="hidden" id="editId" />
         <div>
-          <label>Name</label>
-          <input type="text" id="editName" title="Enter name" placeholder="Name" />
+          <label for="editName">Name</label>
+          <input type="text" id="editName" name="editName" title="Enter name" placeholder="Name" />
         </div>
         <div>
-          <label>Email</label>
-          <input type="email" id="editEmail" title="Enter email address" placeholder="Email address" />
+          <label for="editEmail">Email</label>
+          <input type="email" id="editEmail" name="editEmail" title="Enter email address" placeholder="Email address" />
         </div>
         <div id="eventGroup">
-          <label>Event</label>
-          <input type="text" id="editEvent" title="Enter event name" placeholder="Event name" />
+          <label for="editEvent">Event</label>
+          <input type="text" id="editEvent" name="editEvent" title="Enter event name" placeholder="Event name" />
         </div>
         <div id="requestGroup">
-          <label>Prayer Request</label>
-          <textarea id="editRequest"></textarea>
+          <label for="editRequest">Prayer Request</label>
+          <textarea id="editRequest" name="editRequest"></textarea>
         </div>
         <button type="submit">Save Changes</button>
       </form>
