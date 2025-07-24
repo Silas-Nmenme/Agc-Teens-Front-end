@@ -62,23 +62,33 @@ function togglePanel(panelId) {
 // ============================
 async function loadDashboardStats() {
   try {
-    const [rsvp, prayer, blog, sub] = await Promise.all([
-      fetch("/api/rsvps/count", { headers: authHeaders }).then(r => r.json()),
-      fetch("/api/prayers/count", { headers: authHeaders }).then(r => r.json()),
-      fetch("/api/blogs/count", { headers: authHeaders }).then(r => r.json()),
-      fetch("/api/subscribers/count", { headers: authHeaders }).then(r => r.json()),
-    ]);
+    const rsvpRes = await fetch("/api/rsvps/count", { headers: authHeaders });
+    const prayerRes = await fetch("/api/prayers/count", { headers: authHeaders });
+    const blogRes = await fetch("/api/blogs/count", { headers: authHeaders });
+    const subRes = await fetch("/api/subscribers/count", { headers: authHeaders });
 
-    document.getElementById("rsvpCount").textContent = rsvp?.count || 0;
-    document.getElementById("prayerCount").textContent = prayer?.count || 0;
-    document.getElementById("blogCount").textContent = blog?.count || 0;
-    document.getElementById("subscriberCount").textContent = sub?.count || 0;
+    const rsvp = await rsvpRes.json();
+    const prayer = await prayerRes.json();
+    const blog = await blogRes.json();
+    const sub = await subRes.json();
+
+    if (!rsvpRes.ok) throw new Error(rsvp.error || "RSVP fetch failed");
+    if (!prayerRes.ok) throw new Error(prayer.error || "Prayer fetch failed");
+    if (!blogRes.ok) throw new Error(blog.error || "Blog fetch failed");
+    if (!subRes.ok) throw new Error(sub.error || "Subscriber fetch failed");
+
+    document.getElementById("rsvpCount").textContent = rsvp.count || 0;
+    document.getElementById("prayerCount").textContent = prayer.count || 0;
+    document.getElementById("blogCount").textContent = blog.count || 0;
+    document.getElementById("subscriberCount").textContent = sub.count || 0;
 
   } catch (err) {
-    console.error("Dashboard stat error:", err);
-    showToast("Error loading dashboard stats", "error");
+    console.error("Stat load error:", err);
+    showToast(err.message, "error");
   }
 }
+
+
 
 
 // ============================
