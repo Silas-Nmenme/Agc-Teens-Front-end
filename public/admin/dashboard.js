@@ -56,29 +56,41 @@ function togglePanel(panelId) {
   }
 }
 
+// ============================
+// Dropdown Menu Toggle
+// ============================
+function toggleDropdown(show) {
+  const dropdown = document.getElementById("adminDropdown");
+  if (dropdown) {
+    dropdown.classList.toggle("hidden", !show);
+  }
+}
 
 // ============================
 // Dashboard Stats Fetcher
 // ============================
 async function loadDashboardStats() {
   try {
-    const endpoints = [
-      { url: "/api/rsvp/count", el: "rsvpCount" },
-      { url: "/api/prayer/count", el: "prayerCount" },
-      { url: "/api/blog/count", el: "blogCount" },
-      { url: "/api/subscriber/count", el: "subscriberCount" }
-    ];
+    const [rsvp, prayer, blog, sub] = await Promise.all([
+  fetch("/api/rsvps/count", { headers: authHeaders }).then(r => r.json()),
+  fetch("/api/prayers/count", { headers: authHeaders }).then(r => r.json()),
+  fetch("/api/blogs/count", { headers: authHeaders }).then(r => r.json()),
+  fetch("/api/subscribers/count", { headers: authHeaders }).then(r => r.json()),
+]);
 
     for (const ep of endpoints) {
+      const el = document.getElementById(ep.el);
+      if (!el) continue;
       const res = await fetch(ep.url, { headers: authHeaders });
       let data;
       try {
         data = await res.json();
       } catch {
+        el.textContent = "0";
         throw new Error(`Invalid response from ${ep.url}. Is your backend running and returning JSON?`);
       }
       if (!res.ok) throw new Error(data.error || `Fetch failed: ${ep.url}`);
-      document.getElementById(ep.el).textContent = data.count || 0;
+      el.textContent = data.count || 0;
     }
   } catch (err) {
     console.error("Stat load error:", err);
@@ -86,25 +98,31 @@ async function loadDashboardStats() {
   }
 }
 
-
-
-
 // ============================
 // Admin Info
 // ============================
 async function fetchAdminInfo() {
   try {
     const res = await fetch("/api/admin/me", { headers: authHeaders });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from /api/admin/me. Is your backend running and returning JSON?");
+    }
     if (res.ok) {
       currentAdminRole = data.role || "user";
       currentAdminName = data.name || "Admin";
-      document.getElementById("adminDisplayName").textContent = `Welcome, ${currentAdminName}`;
-      document.getElementById("adminEmail").textContent = data.email;
-      document.getElementById("adminRole").textContent = data.role;
+      const nameEl = document.getElementById("adminDisplayName");
+      const emailEl = document.getElementById("adminEmail");
+      const roleEl = document.getElementById("adminRole");
+      if (nameEl) nameEl.textContent = `Welcome, ${currentAdminName}`;
+      if (emailEl) emailEl.textContent = data.email || "";
+      if (roleEl) roleEl.textContent = data.role || "";
     }
   } catch (err) {
     console.error("Fetch admin info error:", err);
+    showToast(err.message || "Failed to fetch admin info", "error");
   }
 }
 
@@ -125,7 +143,9 @@ function bindToggleButtons() {
   document.querySelectorAll(".toggle-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const content = btn.nextElementSibling;
-      content.style.display = content.style.display === "block" ? "none" : "block";
+      if (content) {
+        content.style.display = content.style.display === "block" ? "none" : "block";
+      }
     });
   });
 }
@@ -167,13 +187,21 @@ function applyDarkModeFromStorage() {
   }
 }
 
-//Load RSVPs
+// ============================
+// Load RSVPs
+// ============================
 async function loadRSVPs() {
   const listDiv = document.getElementById("rsvpList");
+  if (!listDiv) return;
   listDiv.innerHTML = "<p>Loading...</p>";
   try {
     const res = await fetch("/api/rsvps", { headers: authHeaders });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from /api/rsvps. Is your backend running and returning JSON?");
+    }
     if (!res.ok) throw new Error(data.error || "Failed to fetch RSVPs");
 
     if (!data.rsvps || data.rsvps.length === 0) {
@@ -191,13 +219,21 @@ async function loadRSVPs() {
   }
 }
 
-//Load Prayers
+// ============================
+// Load Prayers
+// ============================
 async function loadPrayers() {
   const listDiv = document.getElementById("prayerList");
+  if (!listDiv) return;
   listDiv.innerHTML = "<p>Loading...</p>";
   try {
     const res = await fetch("/api/prayers", { headers: authHeaders });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from /api/prayers. Is your backend running and returning JSON?");
+    }
     if (!res.ok) throw new Error(data.error || "Failed to fetch prayers");
 
     if (!data.prayers || data.prayers.length === 0) {
@@ -216,13 +252,21 @@ async function loadPrayers() {
   }
 }
 
-//Load Blogs
+// ============================
+// Load Blogs
+// ============================
 async function loadBlogs() {
   const listDiv = document.getElementById("blogList");
+  if (!listDiv) return;
   listDiv.innerHTML = "<p>Loading...</p>";
   try {
     const res = await fetch("/api/blogs", { headers: authHeaders });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from /api/blogs. Is your backend running and returning JSON?");
+    }
     if (!res.ok) throw new Error(data.error || "Failed to fetch blogs");
 
     if (!data.blogs || data.blogs.length === 0) {
@@ -242,14 +286,21 @@ async function loadBlogs() {
   }
 }
 
-
+// ============================
 // Load Subscribers
+// ============================
 async function loadSubscribers() {
   const listDiv = document.getElementById("subscriberList");
+  if (!listDiv) return;
   listDiv.innerHTML = "<p>Loading...</p>";
   try {
     const res = await fetch("/api/subscribers", { headers: authHeaders });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from /api/subscribers. Is your backend running and returning JSON?");
+    }
     if (!res.ok) throw new Error(data.error || "Failed to fetch subscribers");
 
     if (!data.subscribers || data.subscribers.length === 0) {
@@ -268,7 +319,6 @@ async function loadSubscribers() {
   }
 }
 
-
 // ============================
 // Toasts
 // ============================
@@ -284,32 +334,44 @@ function showToast(message, type = "info") {
 // ============================
 // Avatar Dropdown
 // ============================
-document.getElementById("avatarUpload").addEventListener("change", async function() {
-  const file = this.files[0];
-  if (!file) return;
-  const formData = new FormData();
-  formData.append("avatar", file);
+const avatarUpload = document.getElementById("avatarUpload");
+if (avatarUpload) {
+  avatarUpload.addEventListener("change", async function() {
+    const file = this.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("avatar", file);
 
-  try {
-    const res = await fetch("/api/admin/avatar", {
-      method: "POST", // Make sure your backend accepts POST here
-      headers: {
-        Authorization: `Bearer ${token}`
-      },
-      body: formData
-    });
-    const data = await res.json();
-    if (res.ok && data.avatarUrl) {
-      document.getElementById("adminAvatar").src = data.avatarUrl;
-      showToast("Avatar updated!", "success");
-    } else {
-      throw new Error(data.error || "Avatar upload failed");
+    try {
+      const res = await fetch("/api/admin/avatar", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Invalid response from /api/admin/avatar. Is your backend running and returning JSON?");
+      }
+      if (res.ok && data.avatarUrl) {
+        const avatarEl = document.getElementById("adminAvatar");
+        if (avatarEl) avatarEl.src = data.avatarUrl;
+        showToast("Avatar updated!", "success");
+      } else {
+        throw new Error(data.error || "Avatar upload failed");
+      }
+    } catch (err) {
+      showToast(err.message, "error");
     }
-  } catch (err) {
-    showToast(err.message, "error");
-  }
-});
+  });
+}
 
+// ============================
+// Logout
+// ============================
 function logoutAdmin() {
   localStorage.removeItem("adminToken");
   window.location.href = "login.html";
@@ -320,10 +382,16 @@ function logoutAdmin() {
 // ============================
 async function loadMedia() {
   const mediaListDiv = document.getElementById("mediaList");
+  if (!mediaListDiv) return;
   mediaListDiv.innerHTML = "<p>Loading...</p>";
   try {
     const res = await fetch("/api/media", { headers: authHeaders });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from /api/media. Is your backend running and returning JSON?");
+    }
     if (!res.ok) throw new Error(data.error || "Failed to fetch media");
 
     if (!data.media || !data.media.length) {
@@ -400,7 +468,12 @@ function setupMediaUpload() {
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error("Invalid response from /api/media/upload. Is your backend running and returning JSON?");
+      }
       if (!res.ok) throw new Error(data.error || "Upload failed");
       showToast("Media uploaded", "success");
       form.reset();
@@ -450,7 +523,12 @@ async function deleteMedia(id) {
       headers: authHeaders,
     });
 
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Invalid response from delete media. Is your backend running and returning JSON?");
+    }
     if (res.ok) {
       showToast("Deleted successfully", "success");
       loadMedia();
@@ -467,3 +545,4 @@ async function deleteMedia(id) {
 // ============================
 window.togglePanel = togglePanel;
 window.toggleDropdown = toggleDropdown;
+window.logoutAdmin = logoutAdmin;
