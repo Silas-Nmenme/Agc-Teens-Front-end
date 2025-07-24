@@ -30,6 +30,7 @@ window.onload = () => {
   }).finally(() => hideLoading());
 };
 
+
 // ============================
 // Toggle Panel
 // ============================
@@ -67,46 +68,37 @@ function toggleDropdown(show) {
 }
 
 // ============================
-// Dashboard Stats Fetcher
+// Dashboard Stats Fetcher (FIXED)
 // ============================
 async function loadDashboardStats() {
   try {
     const [rsvp, prayer, blog, sub] = await Promise.all([
-  fetch("/api/rsvps/count", { headers: authHeaders }).then(r => r.json()),
-  fetch("/api/prayers/count", { headers: authHeaders }).then(r => r.json()),
-  fetch("/api/blogs/count", { headers: authHeaders }).then(r => r.json()),
-  fetch("/api/subscribers/count", { headers: authHeaders }).then(r => r.json()),
-]);
+      fetch("/api/admin/rsvps/count", { headers: authHeaders }).then(r => r.json()),
+      fetch("/api/admin/prayers/count", { headers: authHeaders }).then(r => r.json()),
+      fetch("/api/blogs/count", { headers: authHeaders }).then(r => r.json()),
+      fetch("/api/admin/subscribers/count", { headers: authHeaders }).then(r => r.json()),
+    ]);
 
-    for (const ep of endpoints) {
-      const el = document.getElementById(ep.el);
-      if (!el) continue;
-      const res = await fetch(ep.url, { headers: authHeaders });
-      let data;
-      try {
-        data = await res.json();
-      } catch {
-        el.textContent = "0";
-        throw new Error(`Invalid response from ${ep.url}. Is your backend running and returning JSON?`);
-      }
-      if (!res.ok) throw new Error(data.error || `Fetch failed: ${ep.url}`);
-      el.textContent = data.count || 0;
-    }
+    document.getElementById("rsvpCount").textContent = rsvp.count ?? 0;
+    document.getElementById("prayerCount").textContent = prayer.count ?? 0;
+    document.getElementById("blogCount").textContent = blog.count ?? 0;
+    document.getElementById("subscriberCount").textContent = sub.count ?? 0;
   } catch (err) {
     console.error("Stat load error:", err);
     showToast(err.message || "Unknown error", "error");
   }
 }
 
+
 // ============================
-// Admin Info
+// Admin Info (FIXED endpoint)
 // ============================
 async function fetchAdminInfo() {
   try {
-    const res = await fetch("/api/admin", { headers: authHeaders });
+    const res = await fetch("/api/admin/me", { headers: authHeaders });
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`Invalid response from /api/admin: ${text}`);
+      throw new Error(`Invalid response from /api/admin/me: ${text}`);
     }
 
     const data = await res.json();
@@ -114,10 +106,12 @@ async function fetchAdminInfo() {
     document.getElementById("adminDisplayName").textContent = `Welcome, ${data.name}`;
     document.getElementById("adminEmail").textContent = data.email;
     document.getElementById("adminRole").textContent = data.role;
-
     if (data.lastLogin) {
       document.getElementById("lastLoginStat").textContent = new Date(data.lastLogin).toLocaleString();
     }
+    // Populate profile form
+    document.getElementById("adminName").value = data.name;
+    document.getElementById("adminEmailInput").value = data.email;
   } catch (err) {
     console.error("Fetch admin info error:", err);
     showToast("Failed to load admin profile", "error");
