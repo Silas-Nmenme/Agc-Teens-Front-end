@@ -62,29 +62,27 @@ function togglePanel(panelId) {
 // ============================
 async function loadDashboardStats() {
   try {
-    const rsvpRes = await fetch("/api/rsvp/count", { headers: authHeaders });
-    const prayerRes = await fetch("/api/prayer/count", { headers: authHeaders });
-    const blogRes = await fetch("/api/blog/count", { headers: authHeaders });
-    const subRes = await fetch("/api/subscriber/count", { headers: authHeaders });
+    const endpoints = [
+      { url: "/api/rsvp/count", el: "rsvpCount" },
+      { url: "/api/prayer/count", el: "prayerCount" },
+      { url: "/api/blog/count", el: "blogCount" },
+      { url: "/api/subscriber/count", el: "subscriberCount" }
+    ];
 
-    const rsvp = await rsvpRes.json();
-    const prayer = await prayerRes.json();
-    const blog = await blogRes.json();
-    const sub = await subRes.json();
-
-    if (!rsvpRes.ok) throw new Error(rsvp.error || "RSVP fetch failed");
-    if (!prayerRes.ok) throw new Error(prayer.error || "Prayer fetch failed");
-    if (!blogRes.ok) throw new Error(blog.error || "Blog fetch failed");
-    if (!subRes.ok) throw new Error(sub.error || "Subscriber fetch failed");
-
-    document.getElementById("rsvpCount").textContent = rsvp.count || 0;
-    document.getElementById("prayerCount").textContent = prayer.count || 0;
-    document.getElementById("blogCount").textContent = blog.count || 0;
-    document.getElementById("subscriberCount").textContent = sub.count || 0;
-
+    for (const ep of endpoints) {
+      const res = await fetch(ep.url, { headers: authHeaders });
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Invalid response from ${ep.url}. Is your backend running and returning JSON?`);
+      }
+      if (!res.ok) throw new Error(data.error || `Fetch failed: ${ep.url}`);
+      document.getElementById(ep.el).textContent = data.count || 0;
+    }
   } catch (err) {
     console.error("Stat load error:", err);
-    showToast(err.message, "error");
+    showToast(err.message || "Unknown error", "error");
   }
 }
 
@@ -269,29 +267,6 @@ async function loadSubscribers() {
     listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
   }
 }
-async function loadSubscribers() {
-  const listDiv = document.getElementById("subscriberList");
-  listDiv.innerHTML = "<p>Loading...</p>";
-  try {
-    const res = await fetch("/api/subscribers", { headers: authHeaders });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to fetch subscribers");
-
-    if (!data.subscribers || data.subscribers.length === 0) {
-      listDiv.innerHTML = "<p>No subscribers found.</p>";
-      return;
-    }
-
-    listDiv.innerHTML = data.subscribers.map(sub => `
-      <div class="subscriber-item">
-        <strong>${sub.email}</strong>
-        <small>Subscribed: ${new Date(sub.subscribedAt).toLocaleDateString()}</small>
-      </div>
-    `).join("");
-  } catch (err) {
-    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
-  }
-}
 
 
 // ============================
@@ -309,12 +284,31 @@ function showToast(message, type = "info") {
 // ============================
 // Avatar Dropdown
 // ============================
-function toggleDropdown(show) {
-  const dropdown = document.getElementById("adminDropdown");
-  if (dropdown) {
-    dropdown.classList.toggle("hidden", !show);
+document.getElementById("avatarUpload").addEventListener("change", async function() {
+  const file = this.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append("avatar", file);
+
+  try {
+    const res = await fetch("/api/admin/avatar", {
+      method: "POST", // Make sure your backend accepts POST here
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      body: formData
+    });
+    const data = await res.json();
+    if (res.ok && data.avatarUrl) {
+      document.getElementById("adminAvatar").src = data.avatarUrl;
+      showToast("Avatar updated!", "success");
+    } else {
+      throw new Error(data.error || "Avatar upload failed");
+    }
+  } catch (err) {
+    showToast(err.message, "error");
   }
-}
+});
 
 function logoutAdmin() {
   localStorage.removeItem("adminToken");

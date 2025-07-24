@@ -84,7 +84,8 @@
         <button class="toggle-btn">Toggle Media</button>
         <div class="panel-content">
           <form id="mediaUploadForm" enctype="multipart/form-data">
-  <input type="file" id="mediaFile" name="file" required />
+  <label for="mediaFile">Upload Media File</label>
+  <input type="file" id="mediaFile" name="file" required title="Select a media file to upload" placeholder="Choose file" />
   <div id="mediaPreview"></div>
   <button type="submit">Upload Media</button>
 </form>
@@ -111,7 +112,7 @@
           <label for="adminName">Name</label>
           <input type="text" id="adminName" required />
           <label for="adminEmail">Email</label>
-          <input type="email" id="adminEmailInput" required />
+          <input type="email" id="adminEmailInput" required title="Enter your email address" placeholder="Email address" />
           <label for="adminPassword">Password</label>
           <input type="password" id="adminPassword" placeholder="Leave blank to keep current" />
           <button type="submit">Update Profile</button>
@@ -130,15 +131,15 @@
         <input type="hidden" id="editId" />
         <div>
           <label>Name</label>
-          <input type="text" id="editName" />
+          <input type="text" id="editName" title="Enter name" placeholder="Name" />
         </div>
         <div>
           <label>Email</label>
-          <input type="email" id="editEmail" />
+          <input type="email" id="editEmail" title="Enter email address" placeholder="Email address" />
         </div>
         <div id="eventGroup">
           <label>Event</label>
-          <input type="text" id="editEvent" />
+          <input type="text" id="editEvent" title="Enter event name" placeholder="Event name" />
         </div>
         <div id="requestGroup">
           <label>Prayer Request</label>
