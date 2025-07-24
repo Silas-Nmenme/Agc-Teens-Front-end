@@ -103,10 +103,10 @@ async function loadDashboardStats() {
 // ============================
 async function fetchAdminInfo() {
   try {
-    const res = await fetch("/api/admin/me", { headers: authHeaders });
+    const res = await fetch("/api/admin", { headers: authHeaders });
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`Invalid response from /api/admin/me: ${text}`);
+      throw new Error(`Invalid response from /api/admin: ${text}`);
     }
 
     const data = await res.json();
