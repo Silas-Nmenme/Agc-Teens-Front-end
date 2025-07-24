@@ -34,24 +34,31 @@ window.onload = () => {
 // Toggle Panel
 // ============================
 function togglePanel(panelId) {
-  document.querySelectorAll(".panel").forEach((p) => p.style.display = "none");
-  document.querySelectorAll(".panel-content").forEach((p) => p.style.display = "none");
-  const panel = document.getElementById(panelId);
-  if (panel) {
-    panel.style.display = "block";
-    const content = panel.querySelector(".panel-content");
+  const allPanels = document.querySelectorAll(".panel");
+  allPanels.forEach((panel) => (panel.style.display = "none"));
+
+  const activePanel = document.getElementById(panelId);
+  if (activePanel) {
+    activePanel.style.display = "block";
+    const content = activePanel.querySelector(".panel-content");
     if (content) content.style.display = "block";
 
-    if (panelId === "rsvpPanel") loadRSVPs();
-    if (panelId === "prayerPanel") loadPrayers();
-    if (panelId === "blogPanel") loadBlogs();
-    if (panelId === "mediaPanel") loadMedia();
-    if (panelId === "subscribersPanel") loadSubscribers();
+    switch (panelId) {
+      case "rsvpPanel": loadRSVPs(); break;
+      case "prayerPanel": loadPrayers(); break;
+      case "blogPanel": loadBlogs(); break;
+      case "mediaPanel": loadMedia(); break;
+      case "subscribersPanel": loadSubscribers(); break;
+      case "profilePanel": fetchAdminInfo(); break;
+    }
+
+    loadDashboardStats(); // Refresh top cards too
   }
 }
 
+
 // ============================
-// Dashboard Stats
+// Dashboard Stats Fetcher
 // ============================
 async function loadDashboardStats() {
   try {
@@ -61,14 +68,18 @@ async function loadDashboardStats() {
       fetch("/api/blogs/count", { headers: authHeaders }).then(r => r.json()),
       fetch("/api/subscribers/count", { headers: authHeaders }).then(r => r.json()),
     ]);
-    document.getElementById("rsvpCount").textContent = rsvp.count;
-    document.getElementById("prayerCount").textContent = prayer.count;
-    document.getElementById("blogCount").textContent = blog.count;
-    document.getElementById("subscriberCount").textContent = sub.count;
+
+    document.getElementById("rsvpCount").textContent = rsvp?.count || 0;
+    document.getElementById("prayerCount").textContent = prayer?.count || 0;
+    document.getElementById("blogCount").textContent = blog?.count || 0;
+    document.getElementById("subscriberCount").textContent = sub?.count || 0;
+
   } catch (err) {
     console.error("Dashboard stat error:", err);
+    showToast("Error loading dashboard stats", "error");
   }
 }
+
 
 // ============================
 // Admin Info
@@ -106,8 +117,7 @@ function bindToggleButtons() {
   document.querySelectorAll(".toggle-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const content = btn.nextElementSibling;
-      content.style.display =
-        content.style.display === "block" ? "none" : "block";
+      content.style.display = content.style.display === "block" ? "none" : "block";
     });
   });
 }
@@ -149,6 +159,131 @@ function applyDarkModeFromStorage() {
   }
 }
 
+//Load RSVPs
+async function loadRSVPs() {
+  const listDiv = document.getElementById("rsvpList");
+  listDiv.innerHTML = "<p>Loading...</p>";
+  try {
+    const res = await fetch("/api/rsvps", { headers: authHeaders });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to fetch RSVPs");
+
+    if (!data.rsvps || data.rsvps.length === 0) {
+      listDiv.innerHTML = "<p>No RSVPs found.</p>";
+      return;
+    }
+
+    listDiv.innerHTML = data.rsvps.map(rsvp => `
+      <div class="rsvp-item">
+        <strong>${rsvp.name}</strong> (${rsvp.email}) — Event: ${rsvp.event}
+      </div>
+    `).join("");
+  } catch (err) {
+    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+}
+
+//Load Prayers
+async function loadPrayers() {
+  const listDiv = document.getElementById("prayerList");
+  listDiv.innerHTML = "<p>Loading...</p>";
+  try {
+    const res = await fetch("/api/prayers", { headers: authHeaders });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to fetch prayers");
+
+    if (!data.prayers || data.prayers.length === 0) {
+      listDiv.innerHTML = "<p>No prayer requests found.</p>";
+      return;
+    }
+
+    listDiv.innerHTML = data.prayers.map(p => `
+      <div class="prayer-item">
+        <strong>${p.name}</strong> (${p.email}):<br/>
+        <em>${p.request}</em>
+      </div>
+    `).join("");
+  } catch (err) {
+    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+}
+
+//Load Blogs
+async function loadBlogs() {
+  const listDiv = document.getElementById("blogList");
+  listDiv.innerHTML = "<p>Loading...</p>";
+  try {
+    const res = await fetch("/api/blogs", { headers: authHeaders });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to fetch blogs");
+
+    if (!data.blogs || data.blogs.length === 0) {
+      listDiv.innerHTML = "<p>No blogs found.</p>";
+      return;
+    }
+
+    listDiv.innerHTML = data.blogs.map(blog => `
+      <div class="blog-item">
+        <h4>${blog.title}</h4>
+        <p>${blog.content.slice(0, 100)}...</p>
+        <small>By ${blog.author}</small>
+      </div>
+    `).join("");
+  } catch (err) {
+    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+}
+
+
+// Load Subscribers
+async function loadSubscribers() {
+  const listDiv = document.getElementById("subscriberList");
+  listDiv.innerHTML = "<p>Loading...</p>";
+  try {
+    const res = await fetch("/api/subscribers", { headers: authHeaders });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to fetch subscribers");
+
+    if (!data.subscribers || data.subscribers.length === 0) {
+      listDiv.innerHTML = "<p>No subscribers found.</p>";
+      return;
+    }
+
+    listDiv.innerHTML = data.subscribers.map(sub => `
+      <div class="subscriber-item">
+        <strong>${sub.email}</strong>
+        <small>Subscribed: ${new Date(sub.subscribedAt).toLocaleDateString()}</small>
+      </div>
+    `).join("");
+  } catch (err) {
+    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+}
+async function loadSubscribers() {
+  const listDiv = document.getElementById("subscriberList");
+  listDiv.innerHTML = "<p>Loading...</p>";
+  try {
+    const res = await fetch("/api/subscribers", { headers: authHeaders });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to fetch subscribers");
+
+    if (!data.subscribers || data.subscribers.length === 0) {
+      listDiv.innerHTML = "<p>No subscribers found.</p>";
+      return;
+    }
+
+    listDiv.innerHTML = data.subscribers.map(sub => `
+      <div class="subscriber-item">
+        <strong>${sub.email}</strong>
+        <small>Subscribed: ${new Date(sub.subscribedAt).toLocaleDateString()}</small>
+      </div>
+    `).join("");
+  } catch (err) {
+    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+}
+
+
 // ============================
 // Toasts
 // ============================
@@ -166,7 +301,9 @@ function showToast(message, type = "info") {
 // ============================
 function toggleDropdown(show) {
   const dropdown = document.getElementById("adminDropdown");
-  dropdown.classList.toggle("hidden", !show);
+  if (dropdown) {
+    dropdown.classList.toggle("hidden", !show);
+  }
 }
 
 function logoutAdmin() {
@@ -175,7 +312,51 @@ function logoutAdmin() {
 }
 
 // ============================
-// Media Upload Preview
+// Media List & Delete
+// ============================
+async function loadMedia() {
+  const mediaListDiv = document.getElementById("mediaList");
+  mediaListDiv.innerHTML = "<p>Loading...</p>";
+  try {
+    const res = await fetch("/api/media", { headers: authHeaders });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to fetch media");
+
+    if (!data.media || !data.media.length) {
+      mediaListDiv.innerHTML = "<p>No media uploaded yet.</p>";
+      return;
+    }
+
+    mediaListDiv.innerHTML = data.media.map(media => {
+      let preview = "";
+      if (media.mimetype.startsWith("image/")) {
+        preview = `<img src="/${media.path}" width="120" style="max-height:80px;object-fit:cover;border-radius:6px;" />`;
+      } else if (media.mimetype.startsWith("video/")) {
+        preview = `<video src="/${media.path}" width="120" controls style="max-height:80px;border-radius:6px;"></video>`;
+      } else if (media.mimetype.startsWith("audio/")) {
+        preview = `<audio src="/${media.path}" controls></audio>`;
+      }
+      return `
+        <div class="media-item">
+          ${preview}
+          <div>
+            <strong>${media.originalname}</strong>
+            <small>(${Math.round(media.size/1024)} KB, ${media.mimetype})</small>
+          </div>
+          <div class="action-buttons">
+            <a href="/${media.path}" target="_blank" class="edit-btn">View</a>
+            <button class="delete-btn" onclick="deleteMedia('${media._id}')">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  } catch (err) {
+    mediaListDiv.innerHTML = `<p style="color:red;">${err.message}</p>`;
+  }
+}
+
+// ============================
+// Media Upload Preview & Submit
 // ============================
 function setupMediaUpload() {
   const form = document.getElementById("mediaUploadForm");
@@ -203,24 +384,29 @@ function setupMediaUpload() {
   });
 
   form.addEventListener("submit", async function (e) {
-  e.preventDefault();
-  const file = mediaInput.files[0];
-  if (!file) return;
-  const formData = new FormData();
-  formData.append("file", file);
+    e.preventDefault();
+    const file = input.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
 
-  try {
-    await fetch("/api/media/upload", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
-    showToast("Media uploaded", "success");
-    loadMedia();
-  } catch (err) {
-    showToast("Upload failed", "error");
-  }
-});
+    try {
+      const res = await fetch("/api/media/upload", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Upload failed");
+      showToast("Media uploaded", "success");
+      form.reset();
+      preview.innerHTML = "";
+      loadMedia();
+    } catch (err) {
+      showToast(err.message || "Upload failed", "error");
+    }
+  });
+}
 
 // ============================
 // Search Filter
@@ -247,3 +433,33 @@ function setupSearchFilters() {
     });
   }
 }
+
+// ============================
+// Media Delete
+// ============================
+async function deleteMedia(id) {
+  if (!confirm("Are you sure you want to delete this media file?")) return;
+
+  try {
+    const res = await fetch(`/api/media/${id}`, {
+      method: "DELETE",
+      headers: authHeaders,
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      showToast("Deleted successfully", "success");
+      loadMedia();
+    } else {
+      showToast(data.error || "Delete failed", "error");
+    }
+  } catch (err) {
+    showToast("Delete request failed", "error");
+  }
+}
+
+// ============================
+// Expose Functions to HTML
+// ============================
+window.togglePanel = togglePanel;
+window.toggleDropdown = toggleDropdown;
