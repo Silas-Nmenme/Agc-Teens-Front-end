@@ -25,7 +25,7 @@ window.onload = () => {
       setupDarkModeToggle()
       setupMediaUpload()
       setupSearchFilters()
-      setupProfileForm() // NEW: Setup profile form
+      setupProfileForm()
     })
     .finally(() => hideLoading())
 }
@@ -79,24 +79,42 @@ function toggleDropdown(show) {
 }
 
 // ============================
-// Dashboard Stats Fetcher (FIXED)
+// Dashboard Stats Fetcher (FIXED ENDPOINTS)
 // ============================
 async function loadDashboardStats() {
   try {
+    console.log("Loading dashboard stats...")
+
     const [rsvp, prayer, blog, sub] = await Promise.all([
-      fetch("/api/admin/rsvps/count", { headers: authHeaders }).then((r) => r.json()),
-      fetch("/api/admin/prayers/count", { headers: authHeaders }).then((r) => r.json()),
-      fetch("/api/blogs/count", { headers: authHeaders }).then((r) => r.json()),
-      fetch("/api/admin/subscribers/count", { headers: authHeaders }).then((r) => r.json()),
+      fetch("/api/admin/rsvps/count", { headers: authHeaders }).then((r) => {
+        console.log("RSVP response status:", r.status)
+        return r.json()
+      }),
+      fetch("/api/admin/prayers/count", { headers: authHeaders }).then((r) => {
+        console.log("Prayer response status:", r.status)
+        return r.json()
+      }),
+      fetch("/api/admin/blogs/count", { headers: authHeaders }).then((r) => {
+        console.log("Blog response status:", r.status)
+        return r.json()
+      }),
+      fetch("/api/admin/subscribers/count", { headers: authHeaders }).then((r) => {
+        console.log("Subscriber response status:", r.status)
+        return r.json()
+      }),
     ])
+
+    console.log("Stats loaded:", { rsvp, prayer, blog, sub })
 
     document.getElementById("rsvpCount").textContent = rsvp.count ?? 0
     document.getElementById("prayerCount").textContent = prayer.count ?? 0
     document.getElementById("blogCount").textContent = blog.count ?? 0
     document.getElementById("subscriberCount").textContent = sub.count ?? 0
+
+    showToast("Dashboard stats loaded successfully!", "success")
   } catch (err) {
     console.error("Stat load error:", err)
-    showToast(err.message || "Failed to load dashboard stats", "error")
+    showToast("Failed to load dashboard stats: " + err.message, "error")
   }
 }
 
@@ -105,13 +123,23 @@ async function loadDashboardStats() {
 // ============================
 async function fetchAdminInfo() {
   try {
+    console.log("Fetching admin info...")
     const res = await fetch("/api/admin/me", { headers: authHeaders })
+    console.log("Admin info response status:", res.status)
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: ${res.statusText}`)
+    }
+
     const contentType = res.headers.get("content-type")
-    if (!res.ok || !contentType.includes("application/json")) {
-      throw new Error("Invalid or non-JSON response from /api/admin/me")
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await res.text()
+      console.error("Non-JSON response:", text.substring(0, 200))
+      throw new Error("Server returned non-JSON response")
     }
 
     const data = await res.json()
+    console.log("Admin info loaded:", data)
 
     document.getElementById("adminDisplayName").textContent = `Welcome, ${data.name}`
     document.getElementById("adminEmail").textContent = data.email
@@ -124,12 +152,12 @@ async function fetchAdminInfo() {
     document.getElementById("adminEmailInput").value = data.email
   } catch (err) {
     console.error("Fetch admin info error:", err)
-    showToast("Failed to load admin profile", "error")
+    showToast("Failed to load admin profile: " + err.message, "error")
   }
 }
 
 // ============================
-// Setup Profile Form (NEW)
+// Setup Profile Form
 // ============================
 function setupProfileForm() {
   const profileForm = document.getElementById("profileForm")
@@ -196,7 +224,7 @@ function showLoading() {
   spinner.id = "loadingSpinner"
   spinner.style =
     "position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(255,255,255,0.8);z-index:9999;display:flex;justify-content:center;align-items:center;"
-  spinner.innerHTML = `<div style="border:6px solid #f3f3f3;border-top:6px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;"></div>`
+  spinner.innerHTML = `<div style="border:6px solid #f3f3f3;border-top:6px solid #3498db;border-radius:50%;width:40px;height:40px;animation:spin 1s linear infinite;"></div><style>@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style>`
   document.body.appendChild(spinner)
 }
 
@@ -229,7 +257,7 @@ function applyDarkModeFromStorage() {
 }
 
 // ============================
-// Load RSVPs (FIXED)
+// Load RSVPs
 // ============================
 async function loadRSVPs() {
   const listDiv = document.getElementById("rsvpList")
@@ -237,13 +265,12 @@ async function loadRSVPs() {
   listDiv.innerHTML = "<p>Loading...</p>"
   try {
     const res = await fetch("/api/rsvps", { headers: authHeaders })
-    let data
-    try {
-      data = await res.json()
-    } catch {
-      throw new Error("Invalid response from /api/rsvps. Is your backend running and returning JSON?")
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: Failed to fetch RSVPs`)
     }
-    if (!res.ok) throw new Error(data.error || "Failed to fetch RSVPs")
+
+    const data = await res.json()
+    console.log("RSVPs loaded:", data)
 
     if (!data.rsvps || data.rsvps.length === 0) {
       listDiv.innerHTML = "<p>No RSVPs found.</p>"
@@ -264,12 +291,13 @@ async function loadRSVPs() {
       )
       .join("")
   } catch (err) {
-    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`
+    console.error("Load RSVPs error:", err)
+    listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`
   }
 }
 
 // ============================
-// Load Prayers (FIXED)
+// Load Prayers
 // ============================
 async function loadPrayers() {
   const listDiv = document.getElementById("prayerList")
@@ -277,13 +305,12 @@ async function loadPrayers() {
   listDiv.innerHTML = "<p>Loading...</p>"
   try {
     const res = await fetch("/api/prayers", { headers: authHeaders })
-    let data
-    try {
-      data = await res.json()
-    } catch {
-      throw new Error("Invalid response from /api/prayers. Is your backend running and returning JSON?")
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: Failed to fetch prayers`)
     }
-    if (!res.ok) throw new Error(data.error || "Failed to fetch prayers")
+
+    const data = await res.json()
+    console.log("Prayers loaded:", data)
 
     if (!data.prayers || data.prayers.length === 0) {
       listDiv.innerHTML = "<p>No prayer requests found.</p>"
@@ -304,12 +331,13 @@ async function loadPrayers() {
       )
       .join("")
   } catch (err) {
-    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`
+    console.error("Load prayers error:", err)
+    listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`
   }
 }
 
 // ============================
-// Load Blogs (FIXED)
+// Load Blogs
 // ============================
 async function loadBlogs() {
   const listDiv = document.getElementById("blogList")
@@ -317,13 +345,12 @@ async function loadBlogs() {
   listDiv.innerHTML = "<p>Loading...</p>"
   try {
     const res = await fetch("/api/blogs", { headers: authHeaders })
-    let data
-    try {
-      data = await res.json()
-    } catch {
-      throw new Error("Invalid response from /api/blogs. Is your backend running and returning JSON?")
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: Failed to fetch blogs`)
     }
-    if (!res.ok) throw new Error(data.error || "Failed to fetch blogs")
+
+    const data = await res.json()
+    console.log("Blogs loaded:", data)
 
     if (!data.blogs || data.blogs.length === 0) {
       listDiv.innerHTML = "<p>No blogs found.</p>"
@@ -345,12 +372,13 @@ async function loadBlogs() {
       )
       .join("")
   } catch (err) {
-    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`
+    console.error("Load blogs error:", err)
+    listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`
   }
 }
 
 // ============================
-// Load Subscribers (FIXED)
+// Load Subscribers
 // ============================
 async function loadSubscribers() {
   const listDiv = document.getElementById("subscriberList")
@@ -358,13 +386,12 @@ async function loadSubscribers() {
   listDiv.innerHTML = "<p>Loading...</p>"
   try {
     const res = await fetch("/api/subscribers", { headers: authHeaders })
-    let data
-    try {
-      data = await res.json()
-    } catch {
-      throw new Error("Invalid response from /api/subscribers. Is your backend running and returning JSON?")
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: Failed to fetch subscribers`)
     }
-    if (!res.ok) throw new Error(data.error || "Failed to fetch subscribers")
+
+    const data = await res.json()
+    console.log("Subscribers loaded:", data)
 
     if (!data.subscribers || data.subscribers.length === 0) {
       listDiv.innerHTML = "<p>No subscribers found.</p>"
@@ -384,7 +411,8 @@ async function loadSubscribers() {
       )
       .join("")
   } catch (err) {
-    listDiv.innerHTML = `<p style="color:red;">${err.message}</p>`
+    console.error("Load subscribers error:", err)
+    listDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`
   }
 }
 
@@ -404,6 +432,8 @@ function showToast(message, type = "info") {
     z-index: 10000;
     opacity: 0;
     transition: opacity 0.3s;
+    max-width: 300px;
+    word-wrap: break-word;
     ${type === "success" ? "background: #4CAF50;" : ""}
     ${type === "error" ? "background: #f44336;" : ""}
     ${type === "info" ? "background: #2196F3;" : ""}
@@ -411,109 +441,11 @@ function showToast(message, type = "info") {
   toast.textContent = message
   document.body.appendChild(toast)
   setTimeout(() => (toast.style.opacity = "1"), 100)
-  setTimeout(() => toast.remove(), 4000)
+  setTimeout(() => toast.remove(), 5000)
 }
 
 // ============================
-// Avatar Dropdown
-// ============================
-const avatarUpload = document.getElementById("avatarUpload")
-if (avatarUpload) {
-  avatarUpload.addEventListener("change", async function () {
-    const file = this.files[0]
-    if (!file) return
-    const formData = new FormData()
-    formData.append("avatar", file)
-
-    try {
-      const res = await fetch("/api/admin/avatar", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      })
-      let data
-      try {
-        data = await res.json()
-      } catch {
-        throw new Error("Invalid response from /api/admin/avatar. Is your backend running and returning JSON?")
-      }
-      if (res.ok && data.avatarUrl) {
-        const avatarEl = document.getElementById("adminAvatar")
-        if (avatarEl) avatarEl.src = data.avatarUrl
-        showToast("Avatar updated!", "success")
-      } else {
-        throw new Error(data.error || "Avatar upload failed")
-      }
-    } catch (err) {
-      showToast(err.message, "error")
-    }
-  })
-}
-
-// ============================
-// Logout
-// ============================
-function logoutAdmin() {
-  localStorage.removeItem("adminToken")
-  window.location.href = "login.html"
-}
-
-// ============================
-// Media List & Delete
-// ============================
-async function loadMedia() {
-  const mediaListDiv = document.getElementById("mediaList")
-  if (!mediaListDiv) return
-  mediaListDiv.innerHTML = "<p>Loading...</p>"
-  try {
-    const res = await fetch("/api/media", { headers: authHeaders })
-    let data
-    try {
-      data = await res.json()
-    } catch {
-      throw new Error("Invalid response from /api/media. Is your backend running and returning JSON?")
-    }
-    if (!res.ok) throw new Error(data.error || "Failed to fetch media")
-
-    if (!data.media || !data.media.length) {
-      mediaListDiv.innerHTML = "<p>No media uploaded yet.</p>"
-      return
-    }
-
-    mediaListDiv.innerHTML = data.media
-      .map((media) => {
-        let preview = ""
-        if (media.mimetype.startsWith("image/")) {
-          preview = `<img src="/${media.path}" width="120" style="max-height:80px;object-fit:cover;border-radius:6px;" />`
-        } else if (media.mimetype.startsWith("video/")) {
-          preview = `<video src="/${media.path}" width="120" controls style="max-height:80px;border-radius:6px;"></video>`
-        } else if (media.mimetype.startsWith("audio/")) {
-          preview = `<audio src="/${media.path}" controls></audio>`
-        }
-        return `
-        <div class="media-item" style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #ddd;margin:5px 0;border-radius:5px;">
-          ${preview}
-          <div style="flex:1;">
-            <strong>${media.originalname}</strong><br/>
-            <small>(${Math.round(media.size / 1024)} KB, ${media.mimetype})</small>
-          </div>
-          <div class="action-buttons">
-            <a href="/${media.path}" target="_blank" style="padding:5px 10px;background:#007bff;color:white;text-decoration:none;border-radius:3px;margin-right:5px;">View</a>
-            <button onclick="deleteMedia('${media._id}')" style="padding:5px 10px;background:#dc3545;color:white;border:none;border-radius:3px;cursor:pointer;">Delete</button>
-          </div>
-        </div>
-      `
-      })
-      .join("")
-  } catch (err) {
-    mediaListDiv.innerHTML = `<p style="color:red;">${err.message}</p>`
-  }
-}
-
-// ============================
-// Media Upload Preview & Submit
+// Media Upload and Management
 // ============================
 function setupMediaUpload() {
   const form = document.getElementById("mediaUploadForm")
@@ -553,21 +485,92 @@ function setupMediaUpload() {
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       })
-      let data
-      try {
-        data = await res.json()
-      } catch {
-        throw new Error("Invalid response from /api/media/upload. Is your backend running and returning JSON?")
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: Upload failed`)
       }
-      if (!res.ok) throw new Error(data.error || "Upload failed")
+
+      const data = await res.json()
       showToast("Media uploaded successfully!", "success")
       form.reset()
       preview.innerHTML = ""
       loadMedia()
     } catch (err) {
-      showToast(err.message || "Upload failed", "error")
+      console.error("Media upload error:", err)
+      showToast("Upload failed: " + err.message, "error")
     }
   })
+}
+
+async function loadMedia() {
+  const mediaListDiv = document.getElementById("mediaList")
+  if (!mediaListDiv) return
+  mediaListDiv.innerHTML = "<p>Loading...</p>"
+  try {
+    const res = await fetch("/api/media", { headers: authHeaders })
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}: Failed to fetch media`)
+    }
+
+    const data = await res.json()
+    console.log("Media loaded:", data)
+
+    if (!data.media || !data.media.length) {
+      mediaListDiv.innerHTML = "<p>No media uploaded yet.</p>"
+      return
+    }
+
+    mediaListDiv.innerHTML = data.media
+      .map((media) => {
+        let preview = ""
+        if (media.mimetype.startsWith("image/")) {
+          preview = `<img src="/${media.path}" width="120" style="max-height:80px;object-fit:cover;border-radius:6px;" />`
+        } else if (media.mimetype.startsWith("video/")) {
+          preview = `<video src="/${media.path}" width="120" controls style="max-height:80px;border-radius:6px;"></video>`
+        } else if (media.mimetype.startsWith("audio/")) {
+          preview = `<audio src="/${media.path}" controls></audio>`
+        }
+        return `
+        <div class="media-item" style="display:flex;align-items:center;gap:10px;padding:10px;border:1px solid #ddd;margin:5px 0;border-radius:5px;">
+          ${preview}
+          <div style="flex:1;">
+            <strong>${media.originalname}</strong><br/>
+            <small>(${Math.round(media.size / 1024)} KB, ${media.mimetype})</small>
+          </div>
+          <div class="action-buttons">
+            <a href="/${media.path}" target="_blank" style="padding:5px 10px;background:#007bff;color:white;text-decoration:none;border-radius:3px;margin-right:5px;">View</a>
+            <button onclick="deleteMedia('${media._id}')" style="padding:5px 10px;background:#dc3545;color:white;border:none;border-radius:3px;cursor:pointer;">Delete</button>
+          </div>
+        </div>
+      `
+      })
+      .join("")
+  } catch (err) {
+    console.error("Load media error:", err)
+    mediaListDiv.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`
+  }
+}
+
+async function deleteMedia(id) {
+  if (!confirm("Are you sure you want to delete this media file?")) return
+
+  try {
+    const res = await fetch(`/api/media/${id}`, {
+      method: "DELETE",
+      headers: authHeaders,
+    })
+
+    if (res.ok) {
+      showToast("Media deleted successfully!", "success")
+      loadMedia()
+    } else {
+      const data = await res.json()
+      throw new Error(data.error || "Delete failed")
+    }
+  } catch (err) {
+    console.error("Delete media error:", err)
+    showToast("Delete failed: " + err.message, "error")
+  }
 }
 
 // ============================
@@ -597,32 +600,11 @@ function setupSearchFilters() {
 }
 
 // ============================
-// Media Delete
+// Logout
 // ============================
-async function deleteMedia(id) {
-  if (!confirm("Are you sure you want to delete this media file?")) return
-
-  try {
-    const res = await fetch(`/api/media/${id}`, {
-      method: "DELETE",
-      headers: authHeaders,
-    })
-
-    let data
-    try {
-      data = await res.json()
-    } catch {
-      throw new Error("Invalid response from delete media. Is your backend running and returning JSON?")
-    }
-    if (res.ok) {
-      showToast("Media deleted successfully!", "success")
-      loadMedia()
-    } else {
-      showToast(data.error || "Delete failed", "error")
-    }
-  } catch (err) {
-    showToast("Delete request failed", "error")
-  }
+function logoutAdmin() {
+  localStorage.removeItem("adminToken")
+  window.location.href = "login.html"
 }
 
 // ============================
