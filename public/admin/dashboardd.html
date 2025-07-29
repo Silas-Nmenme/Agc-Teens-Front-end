@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard - AGC Teens</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #667eea;
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .container {
+      padding: 2rem;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      text-align: center;
+    }
+
+    .card h3 {
+      font-size: 20px;
+      margin-bottom: 0.5rem;
+    }
+
+    .card span {
+      font-size: 28px;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .section {
+      margin-top: 2.5rem;
+    }
+
+    .section h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-top: 1rem;
+      padding: 1rem;
+      display: none;
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .panel.visible {
+      display: block;
+    }
+
+    .toggle-button {
+      background: #764ba2;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+
+    .logout-btn {
+      background: #e3342f;
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .logout-btn:hover {
+      background: #cc1f1a;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      padding: 0.6rem 0;
+      border-bottom: 1px solid #ddd;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    .blog-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .blog-item button {
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .blog-item button.delete-blog-btn {
+      background: #e3342f;
+    }
+
+    form.blog-edit-form input,
+    form.blog-edit-form textarea {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 0.5rem;
+      margin-top: 0.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    form.blog-edit-form button {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>AGC Teens Admin Dashboard</h1>
+    <button class="logout-btn" id="logoutBtn">Logout</button>
+  </header>
+
+  <div class="container">
+    <div class="section">
+      <h2>Welcome, <span id="adminName">Admin</span></h2>
+      <p><strong>Email:</strong> <span id="adminEmail"></span></p>
+      <p><strong>Last Login:</strong> <span id="adminLastLogin"></span></p>
+    </div>
+
+    <div class="section">
+      <h2>Quick Stats</h2>
+      <div class="card-grid">
+        <div class="card">
+          <h3>RSVPs</h3>
+          <span id="rsvpCount">0</span>
+          <button class="toggle-button" onclick="togglePanel('rsvpPanel')">View RSVPs</button>
+        </div>
+        <div class="card">
+          <h3>Prayer Requests</h3>
+          <span id="prayerCount">0</span>
+          <button class="toggle-button" onclick="togglePanel('prayerPanel')">View Prayers</button>
+        </div>
+        <div class="card">
+          <h3>Subscribers</h3>
+          <span id="subscriberCount">0</span>
+          <button class="toggle-button" onclick="togglePanel('subscriberPanel')">View Subscribers</button>
+        </div>
+        <div class="card">
+          <h3>Blog Posts</h3>
+          <span id="blogCount">0</span>
+          <button class="toggle-button" onclick="togglePanel('blogPanel')">View Blogs</button>
+        </div>
+      </div>
+
+      <div class="panel" id="rsvpPanel">
+        <h3>RSVP Entries</h3>
+        <!-- RSVP list will load here -->
+      </div>
+      <div class="panel" id="prayerPanel">
+        <h3>Prayer Requests</h3>
+        <!-- Prayer list will load here -->
+      </div>
+      <div class="panel" id="subscriberPanel">
+        <h3>Subscribers List</h3>
+        <!-- Subscribers list will load here -->
+      </div>
+      <div class="panel" id="blogPanel">
+        <h3>Blog Posts Editor</h3>
+        <!-- Blog editor will load here -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BASE_URL = "https://agc-teens-backend.onrender.com";
+    const token = localStorage.getItem("adminToken");
+
+    if (!token) {
+      window.location.href = "login.html";
+    }
+
+    async function fetchAdminData() {
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/me`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!res.ok) {
+          throw new Error("Unauthorized");
+        }
+
+        const data = await res.json();
+        document.getElementById("adminName").textContent = data.name;
+        document.getElementById("adminEmail").textContent = data.email;
+        document.getElementById("adminLastLogin").textContent = data.lastLogin ? new Date(data.lastLogin).toLocaleString() : "Never";
+      } catch (err) {
+        localStorage.removeItem("adminToken");
+        window.location.href = "login.html";
+      }
+    }
+
+    async function fetchCounts() {
+      const endpoints = [
+        { id: "rsvpCount", path: "/api/admin/rsvps/count" },
+        { id: "prayerCount", path: "/api/admin/prayers/count" },
+        { id: "subscriberCount", path: "/api/admin/subscribers/count" },
+        { id: "blogCount", path: "/api/admin/blogs/count" }
+      ];
+
+      for (const item of endpoints) {
+        try {
+          const res = await fetch(`${BASE_URL}${item.path}`, {
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+          if (!res.ok) throw new Error("Failed to fetch count");
+          const data = await res.json();
+          document.getElementById(item.id).textContent = data.count;
+        } catch (err) {
+          document.getElementById(item.id).textContent = "--";
+        }
+      }
+    }
+
+    function togglePanel(id) {
+      document.querySelectorAll(".panel").forEach(panel => {
+        panel.classList.remove("visible");
+      });
+      const panel = document.getElementById(id);
+      panel.classList.add("visible");
+
+      // Load data dynamically when panel opens
+      if (id === "rsvpPanel") loadRsvps();
+      if (id === "prayerPanel") loadPrayerRequests();
+      if (id === "subscriberPanel") loadSubscribers();
+      if (id === "blogPanel") loadBlogs();
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("adminToken");
+      fetch(`${BASE_URL}/api/admin/logout`, {
+        method: "POST",
+        credentials: "include"
+      }).finally(() => {
+        window.location.href = "login.html";
+      });
+    });
+
+    fetchAdminData();
+    fetchCounts();
+
+    // Helper to create elements with classes and text
+    function createEl(tag, className, text) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      if (text) el.textContent = text;
+      return el;
+    }
+
+    // Fetch and render RSVP Entries
+    async function loadRsvps() {
+      const panel = document.getElementById("rsvpPanel");
+      panel.innerHTML = "<h3>RSVP Entries</h3>";
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/rsvps`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch RSVPs");
+        const rsvps = await res.json();
+        if (rsvps.length === 0) {
+          panel.appendChild(createEl("p", null, "No RSVP entries found."));
+          return;
+        }
+        const ul = createEl("ul");
+        rsvps.forEach(rsvp => {
+          const li = createEl("li");
+          li.innerHTML = `<strong>${rsvp.name}</strong> (${rsvp.email}) - Guests: ${rsvp.guests} - Attending: ${rsvp.isAttending ? "Yes" : "No"}`;
+          ul.appendChild(li);
+        });
+        panel.appendChild(ul);
+      } catch (err) {
+        panel.appendChild(createEl("p", null, "Error loading RSVP entries."));
+      }
+    }
+
+    // Fetch and render Prayer Requests
+    async function loadPrayerRequests() {
+      const panel = document.getElementById("prayerPanel");
+      panel.innerHTML = "<h3>Prayer Requests</h3>";
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/prayers`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch prayers");
+        const prayers = await res.json();
+        if (prayers.length === 0) {
+          panel.appendChild(createEl("p", null, "No prayer requests found."));
+          return;
+        }
+        const ul = createEl("ul");
+        prayers.forEach(prayer => {
+          const li = createEl("li");
+          li.innerHTML = `<strong>${prayer.name || "Anonymous"}</strong>: ${prayer.message}`;
+          ul.appendChild(li);
+        });
+        panel.appendChild(ul);
+      } catch (err) {
+        panel.appendChild(createEl("p", null, "Error loading prayer requests."));
+      }
+    }
+
+    // Fetch and render Subscribers
+    async function loadSubscribers() {
+      const panel = document.getElementById("subscriberPanel");
+      panel.innerHTML = "<h3>Subscribers List</h3>";
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/subscribers`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch subscribers");
+        const subs = await res.json();
+        if (subs.length === 0) {
+          panel.appendChild(createEl("p", null, "No subscribers found."));
+          return;
+        }
+        const ul = createEl("ul");
+        subs.forEach(sub => {
+          const li = createEl("li");
+          li.textContent = sub.email;
+          ul.appendChild(li);
+        });
+        panel.appendChild(ul);
+      } catch (err) {
+        panel.appendChild(createEl("p", null, "Error loading subscribers."));
+      }
+    }
+
+    // Fetch and render Blog Posts with basic edit/delete UI
+    async function loadBlogs() {
+      const panel = document.getElementById("blogPanel");
+      panel.innerHTML = "<h3>Blog Posts Editor</h3>";
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/blogs`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error("Failed to fetch blogs");
+        const blogs = await res.json();
+        if (blogs.length === 0) {
+          panel.appendChild(createEl("p", null, "No blog posts found."));
+          return;
+        }
+
+        blogs.forEach(blog => {
+          const blogDiv = createEl("div", "blog-item");
+          const title = createEl("span", null, blog.title);
+          const editBtn = createEl("button", null, "Edit");
+          const deleteBtn = createEl("button", "delete-blog-btn", "Delete");
+
+          editBtn.addEventListener("click", () => openEditForm(blog, panel));
+          deleteBtn.addEventListener("click", () => deleteBlog(blog._id, panel));
+
+          blogDiv.appendChild(title);
+          blogDiv.appendChild(editBtn);
+          blogDiv.appendChild(deleteBtn);
+          panel.appendChild(blogDiv);
+        });
+
+      } catch (err) {
+        panel.appendChild(createEl("p", null, "Error loading blogs."));
+      }
+    }
+
+    function openEditForm(blog, panel) {
+      panel.innerHTML = `
+        <h3>Edit Blog Post</h3>
+        <form id="editBlogForm" class="blog-edit-form">
+          <label>Title:<br><input type="text" name="title" value="${blog.title}" required></label><br>
+          <label>Content:<br><textarea name="content" rows="5" required>${blog.content}</textarea></label><br>
+          <button type="submit">Save</button>
+          <button type="button" id="cancelEdit">Cancel</button>
+        </form>
+      `;
+
+      document.getElementById("cancelEdit").onclick = () => loadBlogs();
+
+      document.getElementById("editBlogForm").onsubmit = async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const updatedBlog = {
+          title: formData.get("title"),
+          content: formData.get("content"),
+        };
+
+        try {
+          const res = await fetch(`${BASE_URL}/api/admin/blogs/${blog._id}`, {
+            method: "PUT",
+            headers: {
+              "Authorization": `Bearer ${token}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedBlog)
+          });
+          if (!res.ok) throw new Error("Failed to update blog");
+          alert("Blog updated successfully.");
+          loadBlogs();
+          fetchCounts();
+        } catch (err) {
+          alert("Error updating blog.");
+        }
+      };
+    }
+
+    async function deleteBlog(blogId, panel) {
+      if (!confirm("Are you sure you want to delete this blog post?")) return;
+      try {
+        const res = await fetch(`${BASE_URL}/api/admin/blogs/${blogId}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+        if (!res.ok) throw new Error("Failed to delete blog");
+        alert("Blog deleted.");
+        loadBlogs();
+        fetchCounts();
+      } catch (err) {
+        alert("Error deleting blog.");
+      }
+    }
+  </script>
+</body>
+</html>

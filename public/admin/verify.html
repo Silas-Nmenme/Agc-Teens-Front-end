@@ -55,6 +55,7 @@
   </div>
 
   <script>
+    const BASE_URL = "https://agc-teens-backend.onrender.com";
     document.getElementById("verifyForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
@@ -64,7 +65,7 @@
       verifyMsg.textContent = "";
 
       try {
-        const res = await fetch("https://agc-teens-backend.onrender.com/api/admin/verify-code", {
+        const res = await fetch(`${BASE_URL}/api/admin/verify-code`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, code }),

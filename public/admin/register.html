@@ -379,6 +379,7 @@
   </div>
 
   <script>
+    const BASE_URL = "https://agc-teens-backend.onrender.com";
     // Password toggle functionality
     function setupPasswordToggle(inputId, toggleId) {
       const passwordInput = document.getElementById(inputId);
@@ -541,58 +542,87 @@
     }
 
     // Registration form submission
-    registerForm.addEventListener('submit', async function(e) {
-      e.preventDefault();
+registerForm.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  hideMessage();
+  
+  if (!validateForm()) {
+    return;
+  }
+
+  setLoading(true);
+
+  const formData = new FormData(registerForm);
+  const registerData = {
+    name: formData.get('name'),
+    username: formData.get('username'),
+    email: formData.get('email'),
+    phone: formData.get('phone'),
+    password: formData.get('password'),
+    confirmPassword: formData.get('confirmPassword')
+  };
+
+  console.log('Attempting registration with:', { 
+    name: registerData.name, 
+    email: registerData.email 
+  }); // Debug log
+
+  try {
+    // Check if server is reachable first
+    const healthCheck = await fetch(`${BASE_URL}/api/admin/me`, {
+  method: 'GET',
+  headers: { 'Content-Type': 'application/json' }
+});
+
+const response = await fetch(`${BASE_URL}/api/admin/register`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(registerData)
+});
+
+
+    console.log('Registration response status:', response.status); // Debug log
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Registration error response:', errorText); // Debug log
       
-      hideMessage();
-      
-      if (!validateForm()) {
-        return;
-      }
-
-      setLoading(true);
-
-      const formData = new FormData(registerForm);
-      const registerData = {
-        name: formData.get('name'),
-        username: formData.get('username'),
-        email: formData.get('email'),
-        phone: formData.get('phone'),
-        password: formData.get('password'),
-        confirmPassword: formData.get('confirmPassword')
-      };
-
+      let errorData;
       try {
-        const response = await fetch('/api/admin/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(registerData)
-        });
-
-        const data = await response.json();
-
-        if (response.ok) {
-          registeredEmail = registerData.email;
-          showMessage(data.message, 'success');
-          
-          // Switch to verification section after short delay
-          setTimeout(() => {
-            registrationSection.style.display = 'none';
-            verificationSection.style.display = 'block';
-          }, 2000);
-        } else {
-          showMessage(data.error || 'Registration failed', 'error');
-        }
-      } catch (error) {
-        console.error('Registration error:', error);
-        showMessage('Network error. Please try again.', 'error');
-      } finally {
-        setLoading(false);
+        errorData = JSON.parse(errorText);
+      } catch {
+        throw new Error(`Server error (${response.status}): ${errorText || 'Unknown error'}`);
       }
-    });
+      
+      throw new Error(errorData.error || `Registration failed with status ${response.status}`);
+    }
 
+    const data = await response.json();
+    console.log('Registration successful:', data); // Debug log
+
+    registeredEmail = registerData.email;
+    showMessage(data.message, 'success');
+    
+    // Switch to verification section after short delay
+    setTimeout(() => {
+      registrationSection.style.display = 'none';
+      verificationSection.style.display = 'block';
+    }, 2000);
+  } catch (error) {
+    console.error('Registration error details:', error); // Debug log
+    
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
+      showMessage('Cannot connect to server. Please check if the backend is running on the correct port.', 'error');
+    } else if (error.message.includes('Server is not reachable')) {
+      showMessage('Backend server is not running. Please start the server and try again.', 'error');
+    } else {
+      showMessage(error.message || 'Registration failed. Please try again.', 'error');
+    }
+  } finally {
+    setLoading(false);
+  }
+});
     // Verification form submission
     verificationForm.addEventListener('submit', async function(e) {
       e.preventDefault();
@@ -608,7 +638,7 @@
       setLoading(true, true);
 
       try {
-        const response = await fetch('/api/admin/verify-code', {
+        const response = await fetch(`${BASE_URL}/api/admin/verify-code`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
