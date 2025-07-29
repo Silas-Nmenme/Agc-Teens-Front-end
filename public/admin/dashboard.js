@@ -1,8 +1,36 @@
 // ============================
-// Authentication Check
+// Authentication Check (Enhanced)
 // ============================
 const token = localStorage.getItem("adminToken")
-if (!token) window.location.href = "login.html"
+
+// Only redirect if we're on the dashboard page and no token exists
+if (!token && window.location.pathname.includes("dashboard.html")) {
+  window.location.href = "login.html"
+} else if (token) {
+  // Verify token is still valid
+  fetch("/api/admin/me", {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      if (!response.ok) {
+        // Token is invalid, remove it and redirect to login
+        localStorage.removeItem("adminToken")
+        if (window.location.pathname.includes("dashboard.html")) {
+          window.location.href = "login.html"
+        }
+      }
+    })
+    .catch(() => {
+      // Network error or invalid token
+      localStorage.removeItem("adminToken")
+      if (window.location.pathname.includes("dashboard.html")) {
+        window.location.href = "login.html"
+      }
+    })
+}
 
 const authHeaders = {
   "Content-Type": "application/json",
@@ -79,7 +107,7 @@ function toggleDropdown(show) {
 }
 
 // ============================
-// Dashboard Stats Fetcher (FIXED ENDPOINTS)
+// Dashboard Stats Fetcher
 // ============================
 async function loadDashboardStats() {
   try {
@@ -119,7 +147,7 @@ async function loadDashboardStats() {
 }
 
 // ============================
-// Admin Info (FIXED endpoint)
+// Admin Info
 // ============================
 async function fetchAdminInfo() {
   try {
@@ -157,19 +185,59 @@ async function fetchAdminInfo() {
 }
 
 // ============================
-// Setup Profile Form
+// Setup Profile Form (ENHANCED with password confirmation)
 // ============================
 function setupProfileForm() {
   const profileForm = document.getElementById("profileForm")
   if (!profileForm) return
 
+  // Add password toggle functionality
+  const passwordInput = document.getElementById("adminPassword")
+  const confirmPasswordInput = document.getElementById("adminConfirmPassword")
+
+  if (passwordInput && !document.getElementById("passwordToggleBtn")) {
+    const toggleBtn = document.createElement("button")
+    toggleBtn.type = "button"
+    toggleBtn.id = "passwordToggleBtn"
+    toggleBtn.innerHTML = '<i class="fas fa-eye"></i>'
+    toggleBtn.style.cssText =
+      "position:absolute;right:10px;top:50%;transform:translateY(-50%);border:none;background:none;cursor:pointer;color:#666;"
+
+    const wrapper = document.createElement("div")
+    wrapper.style.position = "relative"
+    passwordInput.parentNode.insertBefore(wrapper, passwordInput)
+    wrapper.appendChild(passwordInput)
+    wrapper.appendChild(toggleBtn)
+
+    toggleBtn.addEventListener("click", () => {
+      const type = passwordInput.type === "password" ? "text" : "password"
+      passwordInput.type = type
+      toggleBtn.innerHTML = type === "password" ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>'
+    })
+  }
+
   profileForm.addEventListener("submit", async (e) => {
     e.preventDefault()
     const formData = new FormData(profileForm)
+    const password = formData.get("adminPassword")
+    const confirmPassword = formData.get("adminConfirmPassword")
+
+    // Validate password confirmation if password is provided
+    if (password && password !== confirmPassword) {
+      showToast("Passwords do not match!", "error")
+      return
+    }
+
+    if (password && password.length < 6) {
+      showToast("Password must be at least 6 characters long!", "error")
+      return
+    }
+
     const data = {
       name: formData.get("adminName"),
       email: formData.get("adminEmail"),
-      password: formData.get("adminPassword"),
+      password: password,
+      confirmPassword: confirmPassword,
     }
 
     try {
@@ -183,10 +251,16 @@ function setupProfileForm() {
       if (res.ok) {
         showToast("Profile updated successfully!", "success")
         fetchAdminInfo() // Refresh admin info
+        // Clear password fields
+        document.getElementById("adminPassword").value = ""
+        if (document.getElementById("adminConfirmPassword")) {
+          document.getElementById("adminConfirmPassword").value = ""
+        }
       } else {
         throw new Error(result.error || "Profile update failed")
       }
     } catch (err) {
+      console.error("Profile update error:", err)
       showToast(err.message, "error")
     }
   })
